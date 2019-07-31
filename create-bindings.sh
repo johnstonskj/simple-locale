@@ -14,6 +14,9 @@ case $(uname) in
       fi
     ;;
   Linux)
+    INCLUDE="/usr/include"
+    BIND_HEADERS=langinfo,localcharset,locale,xlocale
+    MODULE=linux
     ;;
   *)
     echo "Unsupported O/S"
@@ -26,9 +29,9 @@ for HEADER in ${BIND_HEADERS//,/ }
 do
   if [[ -f "$INCLUDE/$HEADER.h" ]] ; then
     echo "generating bindings for $INCLUDE/$HEADER.h into src/ffi/$MODULE/$HEADER.rs"
-    bindgen $INCLUDE/$HEADER.h -o src/ffi/$MODULE/$HEADER.rs
+    bindgen --verbose $INCLUDE/$HEADER.h --output src/ffi/$MODULE/$HEADER.rs
     git add src/ffi/$MODULE/$HEADER.rs
-    MODULES=$(printf "%s\n%s\n" "$MODULES" "pub mod $HEADER;")
+    MODULES=$(printf "%s\n#[allow(non_snake_case, non_camel_case_types, dead_code, unused_variables)]\npub mod %s;\n" "$MODULES" $HEADER)
   else
     echo "header file $HEADER.h does not exist in $INCLUDE"
   fi

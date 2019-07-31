@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use super::InfoString;
+
 pub enum LanguageScope {
     Individual,
     MacroLanguage,
@@ -15,14 +17,12 @@ pub enum LanguageType {
     Special,
 }
 
-pub type InfoString = &'static str;
-
 pub struct LanguageInfo {
-    pub identifier: InfoString,
+    pub code: InfoString,
     pub reference_name: InfoString,
-    pub bibliographic_identifier: Option<InfoString>,
-    pub terminology_identifier: Option<InfoString>,
-    pub short_identifier: Option<InfoString>,
+    pub bibliographic_code: Option<InfoString>,
+    pub terminology_code: Option<InfoString>,
+    pub short_code: Option<InfoString>,
     pub scope: LanguageScope,
     pub l_type: LanguageType,
     pub family_members: Option<Vec<InfoString>>,

@@ -8,3 +8,12 @@ pub trait LocaleScope {
 
     fn get_settings<T>() -> LocaleResult<T>;
 }
+
+pub mod currency;
+pub use currency::CurrencyScope;
+
+pub mod numeric;
+pub use numeric::NumericScope;
+
+pub mod time;
+pub use time::TimeScope;

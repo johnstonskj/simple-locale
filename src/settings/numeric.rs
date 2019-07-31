@@ -1,6 +1,6 @@
 use crate::{LocaleError, LocaleResult};
-use crate::scope::LocaleScope;
 use crate::string::LocaleString;
+use super::LocaleScope;
 
 #[derive(Debug, Clone)]
 pub struct NumericSettings {

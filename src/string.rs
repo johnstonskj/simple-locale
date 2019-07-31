@@ -1,3 +1,7 @@
+use std::fmt;
+use std::fmt::Display;
+use std::str::FromStr;
+
 pub struct LocaleString {
     language_code: String,
     country_code: Option<String>,
@@ -107,6 +111,27 @@ impl LocaleString {
             },
         ]
         .join("")
+    }
+}
+
+impl Display for LocaleString {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_lc_string())
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ParseError {
+    EmptyString,
+    InvalidLanguageCode,
+    InvalidCountryCode,
+}
+
+impl FromStr for LocaleString {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Err(ParseError::EmptyString)
     }
 }
 

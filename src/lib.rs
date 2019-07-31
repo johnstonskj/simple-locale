@@ -1,6 +1,7 @@
 pub enum LocaleError {
     InvalidLocaleString,
     UnknownLocale,
+    Unsupported,
 }
 
 pub type LocaleResult<T> = Result<T, LocaleError>;

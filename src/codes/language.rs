@@ -48,4 +48,8 @@ pub fn lookup(code: InfoString) -> Option<&'static LanguageInfo> {
     }
 }
 
+pub fn language_codes() -> Vec<&'static str> {
+    PRIMARY.keys().cloned().collect()
+}
+
 include!("language-data.rs");

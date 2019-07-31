@@ -49,6 +49,7 @@ type_values = {
 }
 
 def write_data_out(main_map, lookup_map):
+    print('/* generated from ISO-639 data files */')
     print('')
     print('fn create_lookup_table() -> HashMap<InfoString, LanguageInfo> {')
     print('    let mut table = HashMap::new();')

@@ -8,4 +8,4 @@ elif [[ ! -d $1 ]] ; then
 fi
 
 echo "generating $(basename $(pwd)) files into $1"
-python generate.py >> $1/codes/languages.rs
+python generate.py > $1/codes/languages-data.rs

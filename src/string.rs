@@ -31,7 +31,11 @@ use std::fmt::Display;
 use std::str::FromStr;
 use std::collections::HashMap;
 
+use crate::codes::country;
+use crate::codes::language;
+
 pub struct LocaleString {
+    strict: bool,
     language_code: String,
     territory: Option<String>,
     code_set: Option<String>,
@@ -131,6 +135,14 @@ pub enum CodeSet {
 
 impl LocaleString {
     pub fn new(language_code: String) -> Self {
+        LocaleString::common_new(language_code, false)
+    }
+
+    pub fn new_strict(language_code: String) -> Self {
+        LocaleString::common_new(language_code, true)
+    }
+
+    fn common_new(language_code: String, strict: bool) -> Self {
         assert_eq!(
             language_code.len(),
             2,
@@ -141,7 +153,17 @@ impl LocaleString {
             true,
             "language codes are lower case only"
         );
+        if strict {
+            let lang_key = language_code.clone();
+            println!("lang_key {}", lang_key);
+            let language = &language::lookup(&lang_key);
+            assert!(
+                language.is_some(),
+                "language code does not exist"
+            );
+        }
         LocaleString {
+            strict,
             language_code,
             territory: None,
             code_set: None,
@@ -160,7 +182,16 @@ impl LocaleString {
             true,
             "language codes are lower case only"
         );
+        if self.strict {
+            let lang_key = language_code.clone();
+            let language = &language::lookup(&lang_key);
+            assert!(
+                language.is_some(),
+                "language code does not exist"
+            );
+        }
         LocaleString {
+            strict: false,
             language_code,
             territory: self.territory.clone(),
             code_set: self.code_set.clone(),
@@ -169,17 +200,29 @@ impl LocaleString {
     }
 
     pub fn with_territory(&self, territory: String) -> Self {
+        println!("with_territory");
         assert_eq!(
             territory.len(),
             2,
-            "country codes are two character only"
+            "territory codes are two character only"
         );
         assert_eq!(
             territory.chars().all(|c| c.is_uppercase()),
             true,
-            "country codes are upper case only"
+            "territory codes are upper case only"
         );
+        if self.strict {
+            println!("strict");
+            let country_key = territory.clone();
+            let country = &country::lookup_country(&country_key);
+            println!("country? {}", country.is_some());
+            assert!(
+                country.is_some(),
+                "country code does not exist"
+            );
+        }
         LocaleString {
+            strict: self.strict,
             language_code: self.language_code.clone(),
             territory: Some(territory),
             code_set: self.code_set.clone(),
@@ -189,6 +232,7 @@ impl LocaleString {
 
     pub fn with_code_set(&self, code_set: CodeSet) -> Self {
         LocaleString {
+            strict: self.strict,
             language_code: self.language_code.clone(),
             territory: self.territory.clone(),
             code_set: Some(code_set.to_string()),
@@ -198,6 +242,7 @@ impl LocaleString {
 
     pub fn with_code_set_string(&self, code_set: String) -> Self {
         LocaleString {
+            strict: self.strict,
             language_code: self.language_code.clone(),
             territory: self.territory.clone(),
             code_set: Some(code_set),
@@ -207,6 +252,7 @@ impl LocaleString {
 
     pub fn with_modifier(&self, modifier: String) -> Self {
         LocaleString {
+            strict: self.strict,
             language_code: self.language_code.clone(),
             territory: self.territory.clone(),
             code_set: self.code_set.clone(),
@@ -222,6 +268,7 @@ impl LocaleString {
             .collect();
 
         LocaleString {
+            strict: self.strict,
             language_code: self.language_code.clone(),
             territory: self.territory.clone(),
             code_set: self.code_set.clone(),
@@ -433,26 +480,26 @@ mod tests {
     use super::{LocaleString, CodeSet};
 
     #[test]
-    #[should_panic(expected = "assertion failed")]
+    #[should_panic(expected = "language codes are two character only")]
     fn test_bad_constructor_length() {
         LocaleString::new("english".to_string());
     }
 
     #[test]
-    #[should_panic(expected = "assertion failed")]
+    #[should_panic(expected = "language codes are lower case only")]
     fn test_bad_constructor_case() {
         LocaleString::new("EN".to_string());
     }
 
     #[test]
-    #[should_panic(expected = "assertion failed")]
+    #[should_panic(expected = "territory codes are two character only")]
     fn test_bad_country_length() {
         LocaleString::new("en".to_string())
             .with_territory("USA".to_string());
     }
 
     #[test]
-    #[should_panic(expected = "assertion failed")]
+    #[should_panic(expected = "territory codes are upper case only")]
     fn test_bad_country_case() {
         LocaleString::new("en".to_string())
             .with_territory("us".to_string());
@@ -527,6 +574,30 @@ mod tests {
 //        assert!(
 //            locale.with_modifiers(modifiers).get_modifier().unwrap().contains("currency=CNY")
 //        );
+    }
+
+    #[test]
+    #[should_panic(expected = "language code does not exist")]
+    #[ignore]
+    fn test_strict_bad_language() {
+        LocaleString::new_strict("xx".to_string());
+    }
+
+    #[test]
+    #[should_panic(expected = "territory code does not exist")]
+    #[ignore]
+    fn test_strict_bad_territory() {
+        println!("test");
+        let locale = LocaleString::new_strict("en".to_string());
+        println!("created");
+        locale.with_territory("XX".to_string());
+    }
+
+    #[test]
+    #[ignore]
+    fn test_strict_constructor() {
+        let locale = LocaleString::new_strict("en".to_string());
+        assert_eq!(locale.get_language_code(), "en".to_string());
     }
 
     #[test]

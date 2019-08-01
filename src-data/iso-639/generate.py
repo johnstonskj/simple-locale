@@ -63,6 +63,7 @@ def write_data_out(tl_names, main_map, lookup_map):
     print('    let mut table = HashMap::new();')
     for (id, linfo) in main_map.items():
         print('    table.insert("%s", LanguageInfo {' % id)
+        print('    table.insert("%s", LanguageInfo {' % id)
         print('        code: "%s",' % id)
         print('        reference_name: "%s",' % linfo['name'].replace("'", "\\'").replace('"', '\\"'))
         print('        indigenous_name: %s,' % indigenous_name(linfo['sid'], tl_names))

@@ -31,10 +31,10 @@ def write_data(regions, countries):
     print('/* generated from ISO-3166 data files */')
     print('')
 
-    print('fn create_region_table() -> HashMap<u16, Region> {')
+    print('fn create_region_table() -> HashMap<u16, &\'static Region> {')
     print('    let mut table = HashMap::new();')
     for (code, name) in regions.items():
-        print('    table.insert(%d, Region {' % code)
+        print('    table.insert(%d, &Region {' % code)
         print('        code: %d,' % code)
         print('        name: "%s",' % name)
         print('    });')
@@ -42,10 +42,14 @@ def write_data(regions, countries):
     print('}')
 
     lookup_map = {}
-    print('fn create_country_table() -> HashMap<InfoString, CountryInfo> {')
-    print('    let mut table = HashMap::new();')
+    LIMIT=25
+    counter = 0
     for (code, cinfo) in countries.items():
-        print('    table.insert("%s", CountryInfo {' % cinfo['code'])
+        if counter % LIMIT == 0:
+            if counter > 0:
+                print('}')
+            print('fn add_to_lookup_table_%d(table: &mut HashMap<InfoString, &\'static CountryInfo>) {' % int(counter / LIMIT))
+        print('    table.insert("%s", &CountryInfo {' % cinfo['code'])
         print('        code: "%s",' % cinfo['code'])
         print('        short_code: "%s",' % cinfo['short'])
         print('        country_code: %d,' % cinfo['country'])
@@ -55,13 +59,19 @@ def write_data(regions, countries):
         print('    });')
         if isinstance(cinfo['short'], str):
             lookup_map[cinfo['short']] = cinfo['code']
-    print('    table')
+        counter = counter + 1
     print('}')
 
-    print('fn create_lookup_table() -> HashMap<InfoString, InfoString> {')
-    print('    let mut table = HashMap::new();')
+    print('fn add_to_lookup_table_idx(table: &mut HashMap<InfoString, &\'static CountryInfo>) {')
     for (short, code) in lookup_map.items():
-        print('    table.insert("%s", "%s");' % (short, code))
+        print('    table.insert("%s", table.get("%s").unwrap());' % (short, code))
+    print('}')
+
+    print('fn create_country_table() -> HashMap<InfoString, &\'static CountryInfo> {')
+    print('    let mut table = HashMap::new();')
+    for fn in range(int(counter / LIMIT) + 1):
+        print('    add_to_lookup_table_%d(&mut table);' % fn)
+    print('    add_to_lookup_table_idx(&mut table);')
     print('    table')
     print('}')
 

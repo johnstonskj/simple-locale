@@ -1,7 +1,6 @@
 /* generated from ISO-639 data files */
 
-fn create_lookup_table() -> HashMap<InfoString, LanguageInfo> {
-    let mut table = HashMap::new();
+fn add_to_lookup_table(table: &mut HashMap<InfoString, LanguageInfo>) {
     table.insert("aaa", LanguageInfo {
         code: "aaa",
         reference_name: "Ghotuo",
@@ -14,6 +13,11 @@ fn create_lookup_table() -> HashMap<InfoString, LanguageInfo> {
         l_type: LanguageType::Living,
         family_members: None,
     });
+}
+
+fn create_lookup_table() -> HashMap<InfoString, LanguageInfo> {
+    let mut table = HashMap::new();
+    add_to_lookup_table(&mut table);
     table.insert("aab", LanguageInfo {
         code: "aab",
         reference_name: "Alumu-Tesu",

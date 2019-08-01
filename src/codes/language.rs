@@ -2,6 +2,10 @@ use std::collections::HashMap;
 
 use super::InfoString;
 
+// ------------------------------------------------------------------------------------------------
+// Public Types
+// ------------------------------------------------------------------------------------------------
+
 pub enum LanguageScope {
     Individual,
     MacroLanguage,
@@ -30,20 +34,32 @@ pub struct LanguageInfo {
     pub family_members: Option<Vec<InfoString>>,
 }
 
+// ------------------------------------------------------------------------------------------------
+// Public Functions
+// ------------------------------------------------------------------------------------------------
+
 lazy_static! {
     static ref PRIMARY: HashMap<InfoString, LanguageInfo> = create_lookup_table();
     static ref SECONDARY: HashMap<InfoString, InfoString> = create_id_lookup_table();
 }
 
-pub fn lookup(code: InfoString) -> Option<&'static LanguageInfo> {
-    assert!(code.len() < 2 || code.len() > 3, "language code must be either 2, or 3, digits long.");
+pub fn lookup(code: &str) -> Option<&'static LanguageInfo> {
+    println!(">>> {}", code);
+    assert!(code.len() == 2 || code.len() == 3, "language code must be either 2, or 3, characters long.");
     match code.len() {
         3 => match PRIMARY.get(code) {
             Some(v) => Some(v),
             None => None,
         },
         2 => match SECONDARY.get(code) {
-            Some(v) => lookup(v),
+            Some(v) => {
+                assert_eq!(v.len(), 3);
+                println!("rec: {}", v);
+                match PRIMARY.get(code) {
+                    Some(v) => Some(v),
+                    None => None,
+                }
+            },
             None => None,
         },
         _ => None,
@@ -54,4 +70,24 @@ pub fn language_codes() -> Vec<&'static str> {
     PRIMARY.keys().cloned().collect()
 }
 
+// ------------------------------------------------------------------------------------------------
+// Generated Data
+// ------------------------------------------------------------------------------------------------
+
 include!("language-data.rs");
+
+// ------------------------------------------------------------------------------------------------
+// Unit Tests
+// ------------------------------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // --------------------------------------------------------------------------------------------
+    #[test]
+    fn test_language_codes() {
+        let codes = language_codes();
+        assert!(codes.len() > 0);
+    }
+}

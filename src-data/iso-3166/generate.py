@@ -32,7 +32,7 @@ def write_data(regions, countries, out_path):
     r_rows = map(
         lambda rinfo: '"%s":"%s"' % (rinfo[0], rinfo[1]),
         regions.items())
-    print('writing regions.json')
+    print('writing %s/regions.json' % out_path)
     with open('%s/regions.json' % out_path, 'w') as text_file:
         print('{%s}' % ','.join(r_rows), file=text_file)
 
@@ -49,7 +49,7 @@ def write_data(regions, countries, out_path):
                     '"intermediate_region_code":%s' % ('null' if cinfo['intermediate'] is None else '%s' % cinfo['intermediate'])
                 ])),
         countries)
-    print('writing countries.json')
+    print('writing %s/countries.json' % out_path)
     with open('%s/countries.json' % out_path, 'w') as text_file:
         print('{%s}' % ','.join(c_rows), file=text_file)
 

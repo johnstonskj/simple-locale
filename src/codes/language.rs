@@ -1,19 +1,19 @@
 use std::collections::HashMap;
 
-use super::InfoString;
+use serde::{Deserialize, Serialize};
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum LanguageScope {
     Individual,
     MacroLanguage,
     Special,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum LanguageType {
     Ancient,
     Constructed,
@@ -23,18 +23,18 @@ pub enum LanguageType {
     Special,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LanguageInfo {
-    pub code: InfoString,
-    pub reference_name: InfoString,
-    pub indigenous_name: Option<InfoString>,
-    pub other_names: Option<Vec<InfoString>>,
-    pub bibliographic_code: Option<InfoString>,
-    pub terminology_code: Option<InfoString>,
-    pub short_code: Option<InfoString>,
+    pub code: String,
+    pub reference_name: String,
+    pub indigenous_name: Option<String>,
+    pub other_names: Option<Vec<String>>,
+    pub bibliographic_code: Option<String>,
+    pub terminology_code: Option<String>,
+    pub short_code: Option<String>,
     pub scope: LanguageScope,
     pub l_type: LanguageType,
-    pub family_members: Option<Vec<InfoString>>,
+    pub family_members: Option<Vec<String>>,
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -42,23 +42,23 @@ pub struct LanguageInfo {
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref PRIMARY: HashMap<InfoString, LanguageInfo> = create_lookup_table();
-    static ref SECONDARY: HashMap<InfoString, InfoString> = create_id_lookup_table();
+    static ref LANGUAGES: HashMap<String, LanguageInfo> = create_lookup_table();
+    static ref LOOKUP: HashMap<String, String> = create_id_lookup_table();
 }
 
 pub fn lookup(code: &str) -> Option<&'static LanguageInfo> {
     println!(">>> {}", code);
     assert!(code.len() == 2 || code.len() == 3, "language code must be either 2, or 3, characters long.");
     match code.len() {
-        3 => match PRIMARY.get(code) {
+        3 => match LANGUAGES.get(code) {
             Some(v) => Some(v),
             None => None,
         },
-        2 => match SECONDARY.get(code) {
+        2 => match LOOKUP.get(code) {
             Some(v) => {
                 assert_eq!(v.len(), 3);
                 println!("rec: {}", v);
-                match PRIMARY.get(code) {
+                match LANGUAGES.get(code) {
                     Some(v) => Some(v),
                     None => None,
                 }
@@ -69,8 +69,8 @@ pub fn lookup(code: &str) -> Option<&'static LanguageInfo> {
     }
 }
 
-pub fn language_codes() -> Vec<&'static str> {
-    PRIMARY.keys().cloned().collect()
+pub fn language_codes() -> Vec<String> {
+    LANGUAGES.keys().cloned().collect()
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -87,11 +87,15 @@ include!("language-data.rs");
 mod tests {
     use super::*;
 
+    use serde_json::ser::to_string_pretty;
+
     // --------------------------------------------------------------------------------------------
-    #[ignore]
     #[test]
-    fn test_language_codes() {
-        let codes = language_codes();
-        assert!(codes.len() > 0);
+    fn test_language_loading() {
+        println!("*****");
+        match lookup("aab") {
+            None => println!("OH CRAP"),
+            Some(l) => println!("{:#?}", to_string_pretty(l)),
+        }
     }
 }

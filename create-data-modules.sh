@@ -8,10 +8,10 @@ elif [[ ! -d $1 ]] ; then
 fi
 
 pushd "$1" >/dev/null
-OUTPUT_DIR=$(pwd)
+OUTPUT_DIR="$(pwd)/codes/data"
 popd >/dev/null
 
-echo "output location is $OUTPUT_DIR"
+echo "data file output location is $OUTPUT_DIR"
 
 cd src-data
 for f in *
@@ -19,7 +19,8 @@ do
     if [[ -d "$f" ]] ; then
         pushd "$f" >/dev/null
         if [[ -e "generate.sh" ]] ; then
-          ./generate.sh $OUTPUT_DIR
+          echo "generating $(basename $(pwd)) files into $OUTPUT_DIR"
+          python ./generate.py $OUTPUT_DIR
         fi
         popd >/dev/null
     fi

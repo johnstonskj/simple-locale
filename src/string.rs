@@ -45,6 +45,89 @@ const SEP_DASH: char = '-';
 
 const SEP_ALL: &'static str = "_.@";
 
+/* see https://en.wikipedia.org/wiki/Character_encoding */
+#[allow(non_camel_case_types)]
+pub enum CodeSet {
+    ANSEL,
+    ArmSCII_7,
+    ArmSCII_8,
+    ArmSCII_8A,
+    ASCII, // prefer US_ASCII
+    US_ASCII,
+    Big5, // replaces/encodes CCCII
+    Big5_HKSCS,
+    CNS_11643,
+    CP_866,
+    CP_936,
+    CP_949,
+    CP_1131,
+    CP_1251,
+    CP_1386,
+    EBCDIC,
+    EUC_CN,
+    EUC_JP,
+    EUC_KR,
+    GB_2312,
+    GBK, // 2312 extension
+    GB_18030,
+    ISCII,
+    ISCII_BE,
+    ISCII_BNG,
+    ISCII_DE,
+    ISCII_DEV,
+    ISCII_GU,
+    ISCII_GUJ,
+    ISCII_KA,
+    ISCII_KND,
+    ISCII_MA,
+    ISCII_MLM,
+    ISCII_OR,
+    ISCII_ORI,
+    ISCII_PE,
+    ISCII_GUR,
+    ISCII_TA,
+    ISCII_TML,
+    ISCII_TE,
+    ISCII_TIG,
+    ISO_646, // ASCII
+    ISO_6937, // ANSEL
+    ISO_8859_1,
+    ISO_8859_2,
+    ISO_8859_3,
+    ISO_8859_4,
+    ISO_8859_5,
+    ISO_8859_6,
+    ISO_8859_7,
+    ISO_8859_8,
+    ISO_8859_9,
+    ISO_8859_10,
+    ISO_8859_11,
+    ISO_8859_12,
+    ISO_8859_13,
+    ISO_8859_14,
+    ISO_8859_15,
+    ISO_8859_16,
+    ISO_10585, // ArmSCII
+    ISO_10646,
+    KOI7,
+    KOI8,
+    KOI8_R,
+    KOI8_RU,
+    KOI8_T,
+    KOI8_U,
+    PASCII,
+    PT154,
+    Shift_JIS,
+    SJIS,
+    TSCII,
+    UTF_7,
+    UTF_8,
+    UTF_16,
+    UTF_32,
+    VISCII,
+    Other(String),
+}
+
 impl LocaleString {
     pub fn new(language_code: String) -> Self {
         assert_eq!(
@@ -103,7 +186,16 @@ impl LocaleString {
         }
     }
 
-    pub fn with_code_set(&self, code_set: String) -> Self {
+    pub fn with_code_set(&self, code_set: CodeSet) -> Self {
+        LocaleString {
+            language_code: self.language_code.clone(),
+            territory: self.territory.clone(),
+            code_set: Some(code_set.to_string()),
+            modifier: self.modifier.clone(),
+        }
+    }
+
+    pub fn with_code_set_string(&self, code_set: String) -> Self {
         LocaleString {
             language_code: self.language_code.clone(),
             territory: self.territory.clone(),
@@ -191,6 +283,92 @@ impl LocaleString {
     }
 }
 
+impl Display for CodeSet {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match self {
+            CodeSet::ANSEL=> "ANSEL",
+            CodeSet::ArmSCII_7 => "ARMSCII-7",
+            CodeSet::ArmSCII_8=> "ARMSCII-8",
+            CodeSet::ArmSCII_8A=> "ARMSCII-8A",
+            CodeSet::ASCII=> "ASCII",
+            CodeSet::US_ASCII=> "US-ASCII",
+            CodeSet::Big5=> "Big5",
+            CodeSet::Big5_HKSCS=> "Big5HKSCS",
+            CodeSet::CNS_11643 => "CNS11643",
+            CodeSet::CP_866=> "CP866",
+            CodeSet::CP_936=> "CP936",
+            CodeSet::CP_949=> "CP949",
+            CodeSet::CP_1131=> "CP1131",
+            CodeSet::CP_1251=> "CP1251",
+            CodeSet::CP_1386=> "CP1386",
+            CodeSet::EBCDIC=> "EBCDIC",
+            CodeSet::EUC_CN=> "eucCN",
+            CodeSet::EUC_JP=> "eucJP",
+            CodeSet::EUC_KR=> "eucKR",
+            CodeSet::GB_2312=> "GB2312",
+            CodeSet::GBK=> "GBK", // 2312 extension
+            CodeSet::GB_18030=> "GB18030",
+            CodeSet::ISCII=> "ISCII",
+            CodeSet::ISCII_BE=> "ISCII-BE",
+            CodeSet::ISCII_BNG=> "ISCII-BNG",
+            CodeSet::ISCII_DE=> "ISCII-DE",
+            CodeSet::ISCII_DEV=> "ISCII-DEV",
+            CodeSet::ISCII_GU => "ISCII-GU",
+            CodeSet::ISCII_GUJ => "ISCII-GUJ",
+            CodeSet::ISCII_KA=> "ISCII-KA",
+            CodeSet::ISCII_KND=> "ISCII-KND",
+            CodeSet::ISCII_MA=> "ISCII-MA",
+            CodeSet::ISCII_MLM=> "ISCII-MLM",
+            CodeSet::ISCII_OR=> "ISCII-OR",
+            CodeSet::ISCII_ORI=> "ISCII-ORI",
+            CodeSet::ISCII_PE=> "ISCII-PE",
+            CodeSet::ISCII_GUR=> "ISCII-GUR",
+            CodeSet::ISCII_TA=> "ISCII-TA",
+            CodeSet::ISCII_TML=> "ISCII-TML",
+            CodeSet::ISCII_TE=> "ISCII-TE",
+            CodeSet::ISCII_TIG=> "ISCII-TIG",
+            CodeSet::ISO_646 => "ISO646",
+            CodeSet::ISO_6937 => "ISO6937",
+            CodeSet::ISO_8859_1 => "ISO8859-1",
+            CodeSet::ISO_8859_2 => "ISO8859-2",
+            CodeSet::ISO_8859_3 => "ISO8859-3",
+            CodeSet::ISO_8859_4 => "ISO8859-4",
+            CodeSet::ISO_8859_5 => "ISO8859-5",
+            CodeSet::ISO_8859_6 => "ISO8859-6",
+            CodeSet::ISO_8859_7 => "ISO8859-7",
+            CodeSet::ISO_8859_8 => "ISO8859-8",
+            CodeSet::ISO_8859_9 => "ISO8859-9",
+            CodeSet::ISO_8859_10 => "ISO8859-10",
+            CodeSet::ISO_8859_11 => "ISO8859-11",
+            CodeSet::ISO_8859_12 => "ISO8859-12",
+            CodeSet::ISO_8859_13 => "ISO8859-13",
+            CodeSet::ISO_8859_14 => "ISO8859-14",
+            CodeSet::ISO_8859_15 => "ISO8859-15",
+            CodeSet::ISO_8859_16 => "ISO8859-16",
+            CodeSet::ISO_10585 => "ISO10585",
+            CodeSet::ISO_10646 => "ISO10646",
+            CodeSet::KOI7 => "KOI7",
+            CodeSet::KOI8 => "KOI8",
+            CodeSet::KOI8_R => "KOI8-R",
+            CodeSet::KOI8_RU => "KOI8-RU",
+            CodeSet::KOI8_T => "KOI8-T",
+            CodeSet::KOI8_U => "KOI8-U",
+            CodeSet::PASCII => "PASCII",
+            CodeSet::PT154 => "PT154",
+            CodeSet::Shift_JIS => "SJIS",
+            CodeSet::SJIS => "SJIS",
+            CodeSet::TSCII => "TSCII",
+            CodeSet::UTF_7 => "UTF-7",
+            CodeSet::UTF_8 => "UTF-8",
+            CodeSet::UTF_16 => "UTF-16",
+            CodeSet::UTF_32 => "UTF-32",
+            CodeSet::VISCII => "VISCII",
+            CodeSet::Other(s) => s,
+        })
+    }
+}
+
+
 impl Display for LocaleString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_posix_string())
@@ -235,7 +413,7 @@ impl FromStr for LocaleString {
                     remaining = &remaining[i..];
                     match separator {
                         SEP_TERRITORY => locale = locale.with_territory(field.to_string()),
-                        SEP_CODE_SET => locale = locale.with_code_set(field.to_string()),
+                        SEP_CODE_SET => locale = locale.with_code_set_string(field.to_string()),
                         SEP_MODIFIER => locale = locale.with_modifier(field.to_string()),
                         _ => panic!("this shouldn't happen"),
                     }
@@ -248,8 +426,9 @@ impl FromStr for LocaleString {
 
 #[cfg(test)]
 mod tests {
-    use crate::string::LocaleString;
     use std::collections::HashMap;
+
+    use super::{LocaleString, CodeSet};
 
     #[test]
     #[should_panic(expected = "assertion failed")]
@@ -307,7 +486,16 @@ mod tests {
     fn test_with_code_set() {
         let locale = LocaleString::new("en".to_string());
         assert_eq!(
-            locale.with_code_set("UTF-8".to_string()).get_code_set(),
+            locale.with_code_set(CodeSet::ISO_8859_13).get_code_set(),
+            Some("ISO8859-13".to_string())
+        );
+    }
+
+    #[test]
+    fn test_with_code_set_string() {
+        let locale = LocaleString::new("en".to_string());
+        assert_eq!(
+            locale.with_code_set_string("UTF-8".to_string()).get_code_set(),
             Some("UTF-8".to_string())
         );
     }
@@ -343,7 +531,7 @@ mod tests {
     fn test_lc_string() {
         let locale = LocaleString::new("en".to_string())
             .with_territory("US".to_string())
-            .with_code_set("UTF-8".to_string())
+            .with_code_set(CodeSet::UTF_8)
             .with_modifier("collation=pinyin;currency=CNY".to_string());
         assert_eq!(locale.to_posix_string(), "en_US.UTF-8@collation=pinyin;currency=CNY".to_string());
     }

@@ -6,12 +6,14 @@ use super::InfoString;
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+#[derive(Debug)]
 pub enum LanguageScope {
     Individual,
     MacroLanguage,
     Special,
 }
 
+#[derive(Debug)]
 pub enum LanguageType {
     Ancient,
     Constructed,
@@ -21,6 +23,7 @@ pub enum LanguageType {
     Special,
 }
 
+#[derive(Debug)]
 pub struct LanguageInfo {
     pub code: InfoString,
     pub reference_name: InfoString,
@@ -85,6 +88,7 @@ mod tests {
     use super::*;
 
     // --------------------------------------------------------------------------------------------
+    #[ignore]
     #[test]
     fn test_language_codes() {
         let codes = language_codes();

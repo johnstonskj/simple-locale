@@ -45,7 +45,6 @@ pub struct LocaleString {
 const SEP_TERRITORY: char = '_';
 const SEP_CODE_SET: char = '.';
 const SEP_MODIFIER: char = '@';
-const SEP_DASH: char = '-';
 
 const SEP_ALL: &'static str = "_.@";
 
@@ -154,13 +153,7 @@ impl LocaleString {
             "language codes are lower case only"
         );
         if strict {
-            let lang_key = language_code.clone();
-            println!("lang_key {}", lang_key);
-            let language = &language::lookup(&lang_key);
-            assert!(
-                language.is_some(),
-                "language code does not exist"
-            );
+            LocaleString::test_known_language(&language_code);
         }
         LocaleString {
             strict,
@@ -183,12 +176,7 @@ impl LocaleString {
             "language codes are lower case only"
         );
         if self.strict {
-            let lang_key = language_code.clone();
-            let language = &language::lookup(&lang_key);
-            assert!(
-                language.is_some(),
-                "language code does not exist"
-            );
+            LocaleString::test_known_language(&language_code);
         }
         LocaleString {
             strict: false,
@@ -212,14 +200,7 @@ impl LocaleString {
             "territory codes are upper case only"
         );
         if self.strict {
-            println!("strict");
-            let country_key = territory.clone();
-            let country = &country::lookup_country(&country_key);
-            println!("country? {}", country.is_some());
-            assert!(
-                country.is_some(),
-                "country code does not exist"
-            );
+            LocaleString::test_known_territory(&territory);
         }
         LocaleString {
             strict: self.strict,
@@ -292,8 +273,30 @@ impl LocaleString {
         self.modifier.clone()
     }
 
-    pub fn to_posix_string(&self) -> String {
-        [
+    fn test_known_language(language_code: &String) {
+        let lang_key = language_code.to_uppercase();
+        let result = &language::lookup(&lang_key);
+        println!("!!! language {} =  {:#?}", lang_key, result);
+        assert!(
+            result.is_some(),
+            "language code does not exist"
+        );
+    }
+
+    fn test_known_territory(territory: &String) {
+        let country_key = territory.clone();
+        let result = &country::lookup_country(&country_key);
+        println!("!!! country {} =  {:#?}", country_key, result);
+        assert!(
+            result.is_some(),
+            "country code does not exist"
+        );
+    }
+}
+
+impl Display for LocaleString {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", [
             self.language_code.clone(),
             match &self.territory {
                 Some(v) => format!("{}{}", SEP_TERRITORY, v),
@@ -307,27 +310,7 @@ impl LocaleString {
                 Some(v) => format!("{}{}", SEP_MODIFIER, v),
                 None => "".to_string(),
             },
-        ]
-        .join("")
-    }
-
-    pub fn to_bcp_string(&self) -> String {
-        [
-            self.language_code.clone(),
-            match &self.territory {
-                Some(v) => format!("{}{}", SEP_DASH, v),
-                None => "".to_string(),
-            },
-            match &self.code_set {
-                Some(v) => format!("{}{}", SEP_DASH, v),
-                None => "".to_string(),
-            },
-            match &self.modifier {
-                Some(v) => format!("{}{}", SEP_DASH, v),
-                None => "".to_string(),
-            },
-        ]
-        .join("")
+        ].join(""))
     }
 }
 
@@ -414,13 +397,6 @@ impl Display for CodeSet {
             CodeSet::VISCII => "VISCII",
             CodeSet::Other(s) => s,
         })
-    }
-}
-
-
-impl Display for LocaleString {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.to_posix_string())
     }
 }
 
@@ -578,14 +554,12 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "language code does not exist")]
-    #[ignore]
     fn test_strict_bad_language() {
         LocaleString::new_strict("xx".to_string());
     }
 
     #[test]
     #[should_panic(expected = "territory code does not exist")]
-    #[ignore]
     fn test_strict_bad_territory() {
         println!("test");
         let locale = LocaleString::new_strict("en".to_string());
@@ -594,7 +568,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_strict_constructor() {
         let locale = LocaleString::new_strict("en".to_string());
         assert_eq!(locale.get_language_code(), "en".to_string());
@@ -606,6 +579,6 @@ mod tests {
             .with_territory("US".to_string())
             .with_code_set(CodeSet::UTF_8)
             .with_modifier("collation=pinyin;currency=CNY".to_string());
-        assert_eq!(locale.to_posix_string(), "en_US.UTF-8@collation=pinyin;currency=CNY".to_string());
+        assert_eq!(locale.to_string(), "en_US.UTF-8@collation=pinyin;currency=CNY".to_string());
     }
 }

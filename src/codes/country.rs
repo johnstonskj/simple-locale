@@ -2,34 +2,18 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::InfoString;
-
 // ------------------------------------------------------------------------------------------------
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+#[derive(Debug)]
 pub struct Region {
-    pub code: u16,
-    pub name: InfoString,
-}
-
-pub struct CountryInfo {
-    pub code: InfoString,
-    pub short_code: InfoString,
-    pub country_code: u16,
-    pub region_code: Option<u16>,
-    pub sub_region_code: Option<u16>,
-    pub intermediate_region_code: Option<u16>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct RegionS {
     pub code: u16,
     pub name: String,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct CountryInfoS {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CountryInfo {
     pub code: String,
     pub short_code: String,
     pub country_code: u16,
@@ -37,28 +21,38 @@ pub struct CountryInfoS {
     pub sub_region_code: Option<u16>,
     pub intermediate_region_code: Option<u16>,
 }
+
 // ------------------------------------------------------------------------------------------------
 // Public Functions
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref REGIONS: HashMap<u16, &'static Region> = create_region_table();
-    static ref COUNTRIES: HashMap<InfoString, &'static CountryInfo> = create_country_table();
+    static ref REGIONS: HashMap<u16, Region> = load_regions_from_json();
+    static ref COUNTRIES: HashMap<String, CountryInfo> = load_countries_from_json();
+    static ref LOOKUP: HashMap<String, String> = load_country_lookup();
 }
 
 pub fn lookup_region(code: u16) -> Option<&'static Region> {
+    info!("lookup_region: {}", code);
     match REGIONS.get(&code) {
-        Some(v) => Some(*v),
+        Some(v) => Some(v),
         None => None,
     }
 }
 
 pub fn lookup_country(code: &str) -> Option<&'static CountryInfo> {
-    println!(">>> lookup_country {}", code);
+    info!("lookup_country: {}", code);
     assert!(code.len() == 2 || code.len() == 3, "country code must be either 2, or 3, characters long.");
-    match COUNTRIES.get(code) {
-        Some(v) => Some(v),
-        None => None,
+    match code.len() {
+        3 => match COUNTRIES.get(code) {
+            Some(v) => Some(v),
+            None => None,
+        },
+        2 => match LOOKUP.get(code) {
+            Some(v) => lookup_country(v),
+            None => None,
+        },
+        _ => None,
     }
 }
 
@@ -66,33 +60,49 @@ pub fn region_codes() -> Vec<u16> {
     REGIONS.keys().cloned().collect()
 }
 
-pub fn country_codes() -> Vec<InfoString> {
+pub fn country_codes() -> Vec<String> {
     COUNTRIES.keys().cloned().collect()
 }
-
-#[test]
-fn test_country_load() {
-    let c = CountryInfoS {
-        code: "AFG".to_string(),
-        short_code: "AF".to_string(),
-        country_code: 4,
-        region_code: Some(142),
-        sub_region_code: Some(34),
-        intermediate_region_code: None,
-    };
-    let mut h: HashMap<String, CountryInfoS> = HashMap::new();
-    h.insert("AFG".to_string(), c);
-    println!("{:#?}", serde_json::to_string(&h));
-    println!("test_country_load {}", COUNTRIES.len());
-    assert!(COUNTRIES.len() > 0);
-}
-
 
 // ------------------------------------------------------------------------------------------------
 // Generated Data
 // ------------------------------------------------------------------------------------------------
 
-include!("country-data.rs");
+fn load_regions_from_json() -> HashMap<u16, Region> {
+    info!("load_regions_from_json - loading JSON");
+    let raw_data = include_bytes!("data/regions.json");
+    info!("load_regions_from_json - deserializing JSON");
+    let raw_map: HashMap<String, String> = serde_json::from_slice(raw_data).unwrap();
+    raw_map
+        .iter()
+        .map(|(code, name)|
+            (
+                code.parse::<u16>().unwrap(),
+                Region {
+                    code: code.parse::<u16>().unwrap(),
+                    name: name.to_string()
+                }))
+        .collect()
+}
+
+fn load_countries_from_json() -> HashMap<String, CountryInfo> {
+    info!("load_countries_from_json - loading JSON");
+    let raw_data = include_bytes!("data/countries.json");
+    info!("load_countries_from_json - deserializing JSON");
+    let country_map: HashMap<String, CountryInfo> = serde_json::from_slice(raw_data).unwrap();
+    info!("load_countries_from_json - loaded {} countries", country_map.len());
+    country_map
+}
+
+fn load_country_lookup() -> HashMap<String, String> {
+    info!("load_country_lookup - create from COUNTRIES");
+    let mut lookup_map: HashMap<String, String> = HashMap::new();
+    for country in COUNTRIES.values() {
+        lookup_map.insert(country.short_code.to_string(), country.code.to_string());
+    }
+    info!("load_country_lookup - mapped {} countries", lookup_map.len());
+    lookup_map
+}
 
 // ------------------------------------------------------------------------------------------------
 // Unit Tests
@@ -105,7 +115,6 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_region_codes() {
-        println!(">>> test_region_codes");
         let codes = region_codes();
         assert!(codes.len() > 0);
     }
@@ -133,7 +142,6 @@ mod tests {
         assert!(codes.len() > 0);
     }
 
-    #[ignore]
     #[test]
     fn test_good_country_code() {
         match lookup_country("DEU") {
@@ -145,7 +153,6 @@ mod tests {
         }
     }
 
-    #[ignore]
     #[test]
     fn test_good_country_short_code() {
         match lookup_country("DE") {

@@ -1,6 +1,14 @@
 import pandas as pd
 
 def read_data_from(created_date):
+    tl_frame = pd.read_csv('iso-639-1-names.csv', sep=',', header=0)
+    tl_names = {}
+    for row in tl_frame.itertuples():
+        tl_names[row.ID] = {
+            'english': row.English_Name,
+            'indigenous': row.Indigenous_Name
+        }
+
     macros = pd.read_csv('iso-639-3-macrolanguages_%s.tab' % created_date, sep='\t', header=0)
     macro_languages = {}
     for row in macros.itertuples():
@@ -31,7 +39,7 @@ def read_data_from(created_date):
         }
         if isinstance(row.Part1, str):
             lookup_map[row.Part1] = row.Id
-    return (main_map, lookup_map)
+    return (tl_names, main_map, lookup_map)
 
 scope_values = {
     'I': 'Individual',
@@ -48,7 +56,7 @@ type_values = {
     'S': 'Special'
 }
 
-def write_data_out(main_map, lookup_map):
+def write_data_out(tl_names, main_map, lookup_map):
     print('/* generated from ISO-639 data files */')
     print('')
     print('fn create_lookup_table() -> HashMap<InfoString, LanguageInfo> {')
@@ -56,7 +64,9 @@ def write_data_out(main_map, lookup_map):
     for (id, linfo) in main_map.items():
         print('    table.insert("%s", LanguageInfo {' % id)
         print('        code: "%s",' % id)
-        print('        reference_name: "%s",' % linfo['name'])
+        print('        reference_name: "%s",' % linfo['name'].replace("'", "\\'").replace('"', '\\"'))
+        print('        indigenous_name: %s,' % indigenous_name(linfo['sid'], tl_names))
+        print('        other_names: %s,' % other_names(linfo['sid'], tl_names))
         print('        bibliographic_code: %s,' % optional_string(linfo['b_id']))
         print('        terminology_code: %s,' % optional_string(linfo['t_id']))
         print('        short_code: %s,'  % optional_string(linfo['sid']))
@@ -75,16 +85,26 @@ def write_data_out(main_map, lookup_map):
     print('    table')
     print('}')
 
-def optional_string(s):
-    if isinstance(s, str):
-        return 'Some("%s")' % s
+def other_names(key, map):
+    if isinstance(key, str) and key in map:
+        names =  map[key]['english'].split(';')
+        if len(names) > 1:
+            return optional_vector(names[1:])
+    return 'None'
+
+def indigenous_name(key, map):
+    if isinstance(key, str) and key in map:
+        return 'Some("%s")' % map[key]['indigenous'].replace("'", "\\'").replace('"', '\\"')
     else:
         return 'None'
+
+def optional_string(s):
+    return ('Some("%s")' % s) if isinstance(s, str) else 'None'
 
 def optional_vector(v):
     if len(v) == 0:
         return 'None'
     else:
-        return 'Some(vec![%s])' % ', '.join(list(map(lambda x: '"%s"' % x, v)))
+        return 'Some(vec![%s])' % ', '.join(list(map(lambda x: '"%s"' % x.strip().replace("'", "\\'").replace('"', '\\"'), v)))
 
 write_data_out(*read_data_from('20190408'))

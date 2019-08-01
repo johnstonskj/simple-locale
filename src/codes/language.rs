@@ -20,6 +20,8 @@ pub enum LanguageType {
 pub struct LanguageInfo {
     pub code: InfoString,
     pub reference_name: InfoString,
+    pub indigenous_name: Option<InfoString>,
+    pub other_names: Option<Vec<InfoString>>,
     pub bibliographic_code: Option<InfoString>,
     pub terminology_code: Option<InfoString>,
     pub short_code: Option<InfoString>,

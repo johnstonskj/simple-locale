@@ -99,7 +99,7 @@ def optional_vector(v):
     if len(v) == 0:
         return 'null'
     else:
-        return '[%s]' % ', '.join(list(map(lambda x: '"%s"' % clean(x), v)))
+        return '[%s]' % ','.join(list(map(lambda x: '"%s"' % clean(x), v)))
 
 if len(sys.argv) < 2:
     print('Error: need a path argument')

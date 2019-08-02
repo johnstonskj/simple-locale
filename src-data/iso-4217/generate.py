@@ -5,32 +5,32 @@ import sys
 
 def read_data():
     frame = pd.read_excel('list_one.xls', skiprows=3, header=0)
-    currencies = []
+    currencies = {}
     for row in frame.itertuples():
-        currencies.append({
-            'alphabetic_code': row._3,
-            'name': row.Currency,
-            'standards_entity': row.ENTITY,
-            'numeric_code': row._4,
-            'symbol': None,
-            'countries': [],
-            'minor_units': row._5
-        })
+        if row._3 in currencies:
+            currencies[row._3]['standards_entities'].append(row.ENTITY)
+        else:
+            currencies[row._3] = {
+                'alphabetic_code': row._3,
+                'name': row.Currency,
+                'numeric_code': row._4,
+                'symbol': None,
+                'standards_entities': [row.ENTITY],
+                'minor_units': row._5
+            }
 
     sub_divisions = {}
     data_set = pd.read_html('forex-currency-codes.html', header=0)
     for frame in data_set:
         for row in frame.itertuples():
-#            print('%s -> %s' % (row.Alphabetic_code, row.Subdivision))
             sub_divisions[row.Alphabetic_code] = row.Subdivision
 
     symbols = {}
     frame = pd.read_csv('currency-symbols-ex.csv', header=0)
     for row in frame.itertuples():
-#        print('%s -> %s' % (row._3, row._6))
         symbols[row._3] = row._6
 
-    return (currencies, sub_divisions, symbols)
+    return (currencies.values(), sub_divisions, symbols)
 
 def write_data_out(currencies, sub_divisions, symbols, out_path):
     rows = map(
@@ -40,18 +40,15 @@ def write_data_out(currencies, sub_divisions, symbols, out_path):
             ','.join([
                 '"alphabetic_code":"%s"' % cinfo['alphabetic_code'],
                 '"name":"%s"' % cinfo['name'],
-                '"standards_entity":"%s"' % clean(cinfo['standards_entity']),
                 '"numeric_code":%s' % optional_number(cinfo['numeric_code']),
                 '"symbol":%s' % optional_string(cinfo['symbol']),
-                '"countries":[]',
+                '"standards_entities":[%s]' % standards_entities_list(cinfo['standards_entities']),
                 '"subdivisions":[%s]' % sub_division_list(sub_divisions.get(cinfo['alphabetic_code'], math.nan), cinfo['minor_units'])
             ])),
         currencies)
-    for row in rows:
-        print(row)
-#     print('writing %s/currencies.json' % out_path)
-#     with open('%s/currencies.json' % out_path, 'w') as text_file:
-#         print('{%s}' % ','.join(rows), file=text_file)
+    print('writing %s/currencies.json' % out_path)
+    with open('%s/currencies.json' % out_path, 'w') as text_file:
+        print('{%s}' % ','.join(rows), file=text_file)
 
 def clean(s):
     return s.strip().replace('"', r'\"')
@@ -61,6 +58,18 @@ def optional_number(n):
 
 def optional_string(s):
     return ('"%s"' % s) if isinstance(s, str) else 'null'
+
+def standards_entities_list(entities):
+    new_list = []
+    for entity in entities:
+        if '_' in entity:
+            new_list.append(entity)
+        else:
+            words = clean(entity).split(' ')
+            new_list.append(
+                ' '.join(list(map(lambda x: x.capitalize(), words)))
+            )
+    return ','.join(list(map(lambda x: '"%s"' % x, new_list)))
 
 def sub_division_list(subs, minor):
     sub_divs = []

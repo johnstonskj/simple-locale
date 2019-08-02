@@ -8,10 +8,9 @@ pub struct Subdivision {
 pub struct CurrencyInfo {
     pub alphabetic_code: String,
     pub name: String,
-    pub standards_entity: String,
     pub numeric_code: Option<u16>,
     pub symbol: Option<String>,
-    pub countries: Vec<String>,
+    pub standards_entities: Vec<String>,
     pub subdivisions: Vec<Subdivision>,
 }
 

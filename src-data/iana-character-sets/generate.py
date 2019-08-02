@@ -35,6 +35,7 @@ def write_data(character_sets, people, out_path):
                     '"reference":%s' %  optional_str(unquote(cinfo['reference']))
                 ])),
         character_sets)
+    # TODO: filter people out of source/reference fields
     print('writing %s/codesets.json' % out_path)
     with open('%s/codesets.json' % out_path, 'w') as text_file:
         print('{%s}' % ','.join(rows), file=text_file)

@@ -53,7 +53,7 @@ mod tests {
     fn test_good_codeset_code() {
         match lookup("UTF-8") {
             None => panic!("was expecting a codeset"),
-            Some(codeset) => assert_eq!(codeset.code.to_string(), "UTF-8".to_string()),
+            Some(codeset) => assert_eq!(codeset.name.to_string(), "UTF-8".to_string()),
         }
     }
 

@@ -2,6 +2,8 @@
 // Public Modules
 // ------------------------------------------------------------------------------------------------
 
+pub mod codeset;
+
 pub mod country;
 
 pub mod currency;

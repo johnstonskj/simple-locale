@@ -34,6 +34,10 @@ use std::str::FromStr;
 use crate::codes::country;
 use crate::codes::language;
 
+// ------------------------------------------------------------------------------------------------
+// Public Types
+// ------------------------------------------------------------------------------------------------
+
 pub struct LocaleString {
     strict: bool,
     language_code: String,
@@ -42,11 +46,14 @@ pub struct LocaleString {
     modifier: Option<String>,
 }
 
-const SEP_TERRITORY: char = '_';
-const SEP_CODE_SET: char = '.';
-const SEP_MODIFIER: char = '@';
-
-const SEP_ALL: &'static str = "_.@";
+#[derive(Debug, PartialEq)]
+pub enum ParseError {
+    EmptyString,
+    InvalidLanguageCode,
+    InvalidCountryCode,
+    InvalidCodeSet,
+    InvalidModifier,
+}
 
 /* see https://en.wikipedia.org/wiki/Character_encoding */
 #[allow(non_camel_case_types)]
@@ -131,6 +138,16 @@ pub enum CodeSet {
     VISCII,
     Other(String),
 }
+
+// ------------------------------------------------------------------------------------------------
+// Implementations - LocaleString
+// ------------------------------------------------------------------------------------------------
+
+const SEP_TERRITORY: char = '_';
+const SEP_CODE_SET: char = '.';
+const SEP_MODIFIER: char = '@';
+
+const SEP_ALL: &'static str = "_.@";
 
 impl LocaleString {
     pub fn new(language_code: String) -> Self {
@@ -237,9 +254,9 @@ impl LocaleString {
     }
 
     pub fn with_modifiers<K, V>(&self, modifiers: HashMap<K, V>) -> Self
-    where
-        K: Display,
-        V: Display,
+        where
+            K: Display,
+            V: Display,
     {
         let modifier_strings: Vec<String> = modifiers
             .iter()
@@ -304,10 +321,54 @@ impl Display for LocaleString {
                     None => "".to_string(),
                 },
             ]
-            .join("")
+                .join("")
         )
     }
 }
+
+impl FromStr for LocaleString {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.len() == 0 {
+            return Err(ParseError::EmptyString);
+        }
+        let (mut locale, remaining) = match s.find(|c: char| SEP_ALL.contains(c)) {
+            None => return Ok(LocaleString::new(s.to_string())),
+            Some(i) => (LocaleString::new(s[..i].to_string()), &s[i..]),
+        };
+        let mut remaining = remaining;
+        while remaining.len() > 0 {
+            let separator = remaining.chars().nth(0).unwrap();
+            remaining = &remaining[1..];
+            match remaining.find(|c: char| SEP_ALL.contains(c)) {
+                None => {
+                    return match separator {
+                        SEP_TERRITORY => Err(ParseError::InvalidCountryCode),
+                        SEP_CODE_SET => Err(ParseError::InvalidCodeSet),
+                        SEP_MODIFIER => Err(ParseError::InvalidModifier),
+                        _ => panic!("this shouldn't happen"),
+                    }
+                }
+                Some(i) => {
+                    let field = &remaining[..i];
+                    remaining = &remaining[i..];
+                    match separator {
+                        SEP_TERRITORY => locale = locale.with_territory(field.to_string()),
+                        SEP_CODE_SET => locale = locale.with_code_set_string(field.to_string()),
+                        SEP_MODIFIER => locale = locale.with_modifier(field.to_string()),
+                        _ => panic!("this shouldn't happen"),
+                    }
+                }
+            }
+        }
+        Err(ParseError::EmptyString)
+    }
+}
+
+// ------------------------------------------------------------------------------------------------
+// Implementations - CodeSet
+// ------------------------------------------------------------------------------------------------
 
 impl Display for CodeSet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -399,54 +460,9 @@ impl Display for CodeSet {
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub enum ParseError {
-    EmptyString,
-    InvalidLanguageCode,
-    InvalidCountryCode,
-    InvalidCodeSet,
-    InvalidModifier,
-}
-
-impl FromStr for LocaleString {
-    type Err = ParseError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s.len() == 0 {
-            return Err(ParseError::EmptyString);
-        }
-        let (mut locale, remaining) = match s.find(|c: char| SEP_ALL.contains(c)) {
-            None => return Ok(LocaleString::new(s.to_string())),
-            Some(i) => (LocaleString::new(s[..i].to_string()), &s[i..]),
-        };
-        let mut remaining = remaining;
-        while remaining.len() > 0 {
-            let separator = remaining.chars().nth(0).unwrap();
-            remaining = &remaining[1..];
-            match remaining.find(|c: char| SEP_ALL.contains(c)) {
-                None => {
-                    return match separator {
-                        SEP_TERRITORY => Err(ParseError::InvalidCountryCode),
-                        SEP_CODE_SET => Err(ParseError::InvalidCodeSet),
-                        SEP_MODIFIER => Err(ParseError::InvalidModifier),
-                        _ => panic!("this shouldn't happen"),
-                    }
-                }
-                Some(i) => {
-                    let field = &remaining[..i];
-                    remaining = &remaining[i..];
-                    match separator {
-                        SEP_TERRITORY => locale = locale.with_territory(field.to_string()),
-                        SEP_CODE_SET => locale = locale.with_code_set_string(field.to_string()),
-                        SEP_MODIFIER => locale = locale.with_modifier(field.to_string()),
-                        _ => panic!("this shouldn't happen"),
-                    }
-                }
-            }
-        }
-        Err(ParseError::EmptyString)
-    }
-}
+// ------------------------------------------------------------------------------------------------
+// Unit Tests
+// ------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {

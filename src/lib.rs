@@ -4,6 +4,28 @@ An higher-level interface to all manner of locale-related information.
 This crate provides a higher-level interface to a number of locale-related
 sources. It does wrap the POSIX (see [ISO/IEC 15897](https://www.iso.org/standard/50707.html))
 operating system functions,
+
+## Example
+
+```
+use simple_locale::LocaleString;
+use simple_locale::codes::{country, currency};
+
+let locale = LocaleString::new_strict("en".to_string())
+    .with_territory("US".to_string())
+    .with_code_set("UTF-8".to_string())
+    .with_modifier("collation=pinyin;currency=CNY".to_string());
+println!("{}", locale);
+
+let mexico = country::lookup_country("MEX").unwrap();
+println!("{:?}", mexico);
+
+let mexico_region = country::lookup_region(mexico.country_code).unwrap();
+println!("{:?}", mexico_region);
+
+let currencies = currency::currencies_for_country_name(mexico_region.name.as_str());
+println!("{:?}", currencies);
+```
 */
 
 #[macro_use]

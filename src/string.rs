@@ -1,22 +1,31 @@
 /*!
+The `LocaleString` type provides the a structure for locale identifier strings.
 
 ## Standards
 
-* https://en.wikipedia.org/wiki/Locale_(computer_software)
-* https://en.wikipedia.org/wiki/IETF_language_tag (https://tools.ietf.org/html/bcp47)
-* https://www.w3.org/TR/ltli/
-* https://en.wikipedia.org/wiki/ISO/IEC_15897 (https://www.iso.org/standard/50707.html, http://www.open-std.org/jtc1/sc22/wg20/docs/n610.pdf)
+> On POSIX platforms such as Unix, Linux and others, locale identifiers are defined by
+> ISO/IEC 15897, which is similar to the BCP 47 definition of language tags, but the
+> locale variant modifier is defined differently, and the character set is included as
+> a part of the identifier.
 
-> On POSIX platforms such as Unix, Linux and others, locale identifiers are defined by ISO/IEC 15897, which is similar to the BCP 47 definition of language tags, but the locale variant modifier is defined differently, and the character set is included as a part of the identifier. It is defined in this format: [language[_territory][.codeset][@modifier]]. (For example, Australian English using the UTF-8 encoding is en_AU.UTF-8.)
+Locale identifiers are defined in this format: `[language[_territory][.codeset][@modifier]]`.
+For example, Australian English using the UTF-8 encoding is `en_AU.UTF-8`.
 
-<code>
-language[_territory[.codeset]][@modifier]
-</code>
+* `language` = [ISO 639-1](https://en.wikipedia.org/wiki/ISO_639-1) 2-character language
+  codes.
+* `territory` = [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) 2-character
+  country codes.
+* `codeset` = an undefined string value, `[a-zA-Z0-9_\-]+`.
+  * For example, [IEC 8859](https://en.wikipedia.org/wiki/ISO/IEC_8859) parts 1 to 16 are
+    usually specified as `ISO8859-1` and so on.
+  * should be taken from the values in the IANA
+    [character sets](https://www.iana.org/assignments/character-sets/character-sets.xhtml)
+    list.
+* `modifier` = a semi-colon separated list of _identifiers_, or _name '=' value_ pairs.
+  * Sometimes this is used to indicate the language script in use, as such values from
+    [ISO 15924](http://unicode.org/iso15924/iso15924-codes.html) should be used.
 
-* language = https://en.wikipedia.org/wiki/ISO_639-1
-* country/territory = https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 / https://en.wikipedia.org/wiki/UN_M49
-* script/encoding = https://en.wikipedia.org/wiki/ISO_15924 (http://unicode.org/iso15924/iso15924-codes.html) / https://en.wikipedia.org/wiki/ISO/IEC_8859
-* modifier = ?
+is the name registered by the MIT X Consortium that identifies the registration authority that owns the specific encoding. A modifier may be added to the registered name but is not required. The modifier is of the form @codeset modifier and identifies the coded character set as defined by that registration authority.
 
 See also:
 
@@ -25,6 +34,11 @@ See also:
 * https://developer.apple.com/documentation/foundation/nslocale
 * https://docs.microsoft.com/en-us/cpp/c-runtime-library/locale-names-languages-and-country-region-strings?view=vs-2019
 * https://docs.microsoft.com/en-us/windows/win32/intl/locale-names
+* https://en.wikipedia.org/wiki/Locale_(computer_software)
+* https://en.wikipedia.org/wiki/IETF_language_tag (https://tools.ietf.org/html/bcp47)
+* https://www.w3.org/TR/ltli/
+* https://en.wikipedia.org/wiki/ISO/IEC_15897 (https://www.iso.org/standard/50707.html, http://www.open-std.org/jtc1/sc22/wg20/docs/n610.pdf)
+
 */
 use std::collections::HashMap;
 use std::fmt;
@@ -53,6 +67,7 @@ pub enum ParseError {
     InvalidCountryCode,
     InvalidCodeSet,
     InvalidModifier,
+    InvalidPath,
 }
 
 // ------------------------------------------------------------------------------------------------

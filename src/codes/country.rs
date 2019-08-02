@@ -33,7 +33,7 @@ lazy_static! {
 }
 
 pub fn lookup_region(code: u16) -> Option<&'static Region> {
-    info!("lookup_region: {}", code);
+    debug!("lookup_region: {}", code);
     match REGIONS.get(&code) {
         Some(v) => Some(v),
         None => None,
@@ -41,16 +41,24 @@ pub fn lookup_region(code: u16) -> Option<&'static Region> {
 }
 
 pub fn lookup_country(code: &str) -> Option<&'static CountryInfo> {
-    info!("lookup_country: {}", code);
+    debug!("lookup_country: {}", code);
     assert!(code.len() == 2 || code.len() == 3, "country code must be either 2, or 3, characters long.");
     match code.len() {
-        3 => match COUNTRIES.get(code) {
-            Some(v) => Some(v),
-            None => None,
+        3 => {
+            debug!("lookup_country: 3-character code");
+            match COUNTRIES.get(code) {
+                Some(v) => Some(v),
+                None => None,
+            }
         },
-        2 => match LOOKUP.get(code) {
-            Some(v) => lookup_country(v),
-            None => None,
+        2 => {
+            debug!("lookup_country: 2-character code");
+            match LOOKUP.get(code) {
+                Some(v) =>
+                    lookup_country(v)
+                ,
+                None => None,
+            }
         },
         _ => None,
     }
@@ -71,7 +79,6 @@ pub fn country_codes() -> Vec<String> {
 fn load_regions_from_json() -> HashMap<u16, Region> {
     info!("load_regions_from_json - loading JSON");
     let raw_data = include_bytes!("data/regions.json");
-    info!("load_regions_from_json - deserializing JSON");
     let raw_map: HashMap<String, String> = serde_json::from_slice(raw_data).unwrap();
     raw_map
         .iter()
@@ -88,7 +95,6 @@ fn load_regions_from_json() -> HashMap<u16, Region> {
 fn load_countries_from_json() -> HashMap<String, CountryInfo> {
     info!("load_countries_from_json - loading JSON");
     let raw_data = include_bytes!("data/countries.json");
-    info!("load_countries_from_json - deserializing JSON");
     let country_map: HashMap<String, CountryInfo> = serde_json::from_slice(raw_data).unwrap();
     info!("load_countries_from_json - loaded {} countries", country_map.len());
     country_map

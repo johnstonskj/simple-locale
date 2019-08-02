@@ -188,7 +188,6 @@ impl LocaleString {
     }
 
     pub fn with_territory(&self, territory: String) -> Self {
-        println!("with_territory");
         assert_eq!(
             territory.len(),
             2,
@@ -274,9 +273,8 @@ impl LocaleString {
     }
 
     fn test_known_language(language_code: &String) {
-        let lang_key = language_code.to_uppercase();
+        let lang_key = language_code.clone();
         let result = &language::lookup(&lang_key);
-        println!("!!! language {} =  {:#?}", lang_key, result);
         assert!(
             result.is_some(),
             "language code does not exist"
@@ -286,10 +284,9 @@ impl LocaleString {
     fn test_known_territory(territory: &String) {
         let country_key = territory.clone();
         let result = &country::lookup_country(&country_key);
-        println!("!!! country {} =  {:#?}", country_key, result);
         assert!(
             result.is_some(),
-            "country code does not exist"
+            "territory code does not exist"
         );
     }
 }
@@ -379,8 +376,8 @@ impl Display for CodeSet {
             CodeSet::ISO_10585 => "ISO10585",
             CodeSet::ISO_10646 => "ISO10646",
             CodeSet::KOI7 => "KOI7",
-            CodeSet::KOI8 => "KOI8",
             CodeSet::KOI8_R => "KOI8-R",
+            CodeSet::KOI8 => "KOI8",
             CodeSet::KOI8_RU => "KOI8-RU",
             CodeSet::KOI8_T => "KOI8-T",
             CodeSet::KOI8_U => "KOI8-U",
@@ -561,16 +558,14 @@ mod tests {
     #[test]
     #[should_panic(expected = "territory code does not exist")]
     fn test_strict_bad_territory() {
-        println!("test");
-        let locale = LocaleString::new_strict("en".to_string());
-        println!("created");
+        let locale = LocaleString::new_strict("aa".to_string());
         locale.with_territory("XX".to_string());
     }
 
     #[test]
     fn test_strict_constructor() {
-        let locale = LocaleString::new_strict("en".to_string());
-        assert_eq!(locale.get_language_code(), "en".to_string());
+        let locale = LocaleString::new_strict("aa".to_string());
+        assert_eq!(locale.get_language_code(), "aa".to_string());
     }
 
     #[test]

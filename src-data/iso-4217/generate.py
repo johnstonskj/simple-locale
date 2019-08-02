@@ -28,6 +28,8 @@ def read_data():
     symbols = {}
     frame = pd.read_csv('currency-symbols-ex.csv', header=0)
     for row in frame.itertuples():
+        if row._3 in currencies:
+            currencies[row._3]['symbol'] = row._6
         symbols[row._3] = row._6
 
     return (currencies.values(), sub_divisions, symbols)

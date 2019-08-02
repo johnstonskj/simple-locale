@@ -31,7 +31,7 @@ lazy_static! {
     static ref NUMERIC_LOOKUP: HashMap<u16, String> = load_currency_lookup();
 }
 
-pub fn lookup_by_alpha(alphabetic_code: &String) -> Option<&'static CurrencyInfo> {
+pub fn lookup_by_alpha(alphabetic_code: &str) -> Option<&'static CurrencyInfo> {
     assert_eq!(alphabetic_code.len(), 3, "currency code must be 3 characters long");
     CURRENCIES.get(alphabetic_code)
 }
@@ -51,13 +51,13 @@ pub fn currency_numeric_codes() -> Vec<u16> {
     NUMERIC_LOOKUP.keys().cloned().collect()
 }
 
-//pub fn currencies_for_country_name(name: String) -> Vec<&'static CurrencyInfo> {
-//    CURRENCIES
-//        .values()
-//        .filter(|currency|
-//            currency.countries.contains(&name)
-//        ).collect()
-//}
+pub fn currencies_for_country_name(name: &str) -> Vec<&'static CurrencyInfo> {
+    CURRENCIES
+        .values()
+        .filter(|currency|
+            currency.standards_entities.contains(&name.to_string())
+        ).collect()
+}
 
 // ------------------------------------------------------------------------------------------------
 // Generated Data
@@ -100,5 +100,36 @@ mod tests {
             None => println!("lookup_by_alpha NO 'GBP'"),
             Some(c) => println!("lookup_by_alpha {:#?}", to_string_pretty(c)),
         }
+    }
+
+    // --------------------------------------------------------------------------------------------
+    #[test]
+    fn test_currency_codes() {
+        let codes = currency_alpha_codes();
+        assert!(codes.len() > 0);
+        let numerics = currency_numeric_codes();
+        assert!(numerics.len() > 0);
+    }
+
+    #[test]
+    fn test_good_currency_code() {
+        match lookup_by_alpha("GBP") {
+            None => panic!("was expecting a currency"),
+            Some(currency) => assert_eq!(currency.name.to_string(), "Pound Sterling".to_string()),
+        }
+    }
+
+    #[test]
+    fn test_bad_currency_code() {
+        match lookup_by_alpha(&"ZZZ") {
+            None => (),
+            Some(_) => panic!("was expecting a None in response"),
+        }
+    }
+
+    #[test]
+    fn test_for_country() {
+        let currencies = currencies_for_country_name("Mexico");
+        assert_eq!(currencies.len(), 2);
     }
 }

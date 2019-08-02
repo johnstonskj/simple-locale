@@ -33,7 +33,7 @@ lazy_static! {
 }
 
 pub fn lookup_region(code: u16) -> Option<&'static Region> {
-    debug!("lookup_region: {}", code);
+    info!("lookup_region: {}", code);
     match REGIONS.get(&code) {
         Some(v) => Some(v),
         None => None,

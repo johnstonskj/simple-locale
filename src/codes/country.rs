@@ -42,7 +42,10 @@ pub fn lookup_region(code: u16) -> Option<&'static Region> {
 
 pub fn lookup_country(code: &str) -> Option<&'static CountryInfo> {
     debug!("lookup_country: {}", code);
-    assert!(code.len() == 2 || code.len() == 3, "country code must be either 2, or 3, characters long.");
+    assert!(
+        code.len() == 2 || code.len() == 3,
+        "country code must be either 2, or 3, characters long."
+    );
     match code.len() {
         3 => {
             debug!("lookup_country: 3-character code");
@@ -50,16 +53,14 @@ pub fn lookup_country(code: &str) -> Option<&'static CountryInfo> {
                 Some(v) => Some(v),
                 None => None,
             }
-        },
+        }
         2 => {
             debug!("lookup_country: 2-character code");
             match LOOKUP.get(code) {
-                Some(v) =>
-                    lookup_country(v)
-                ,
+                Some(v) => lookup_country(v),
                 None => None,
             }
-        },
+        }
         _ => None,
     }
 }
@@ -82,13 +83,15 @@ fn load_regions_from_json() -> HashMap<u16, Region> {
     let raw_map: HashMap<String, String> = serde_json::from_slice(raw_data).unwrap();
     raw_map
         .iter()
-        .map(|(code, name)|
+        .map(|(code, name)| {
             (
                 code.parse::<u16>().unwrap(),
                 Region {
                     code: code.parse::<u16>().unwrap(),
-                    name: name.to_string()
-                }))
+                    name: name.to_string(),
+                },
+            )
+        })
         .collect()
 }
 
@@ -96,7 +99,10 @@ fn load_countries_from_json() -> HashMap<String, CountryInfo> {
     info!("load_countries_from_json - loading JSON");
     let raw_data = include_bytes!("data/countries.json");
     let country_map: HashMap<String, CountryInfo> = serde_json::from_slice(raw_data).unwrap();
-    info!("load_countries_from_json - loaded {} countries", country_map.len());
+    info!(
+        "load_countries_from_json - loaded {} countries",
+        country_map.len()
+    );
     country_map
 }
 
@@ -106,7 +112,10 @@ fn load_country_lookup() -> HashMap<String, String> {
     for country in COUNTRIES.values() {
         lookup_map.insert(country.short_code.to_string(), country.code.to_string());
     }
-    info!("load_country_lookup - mapped {} countries", lookup_map.len());
+    info!(
+        "load_country_lookup - mapped {} countries",
+        lookup_map.len()
+    );
     lookup_map
 }
 
@@ -155,7 +164,7 @@ mod tests {
             Some(country) => {
                 assert_eq!(country.short_code, "DE");
                 assert_eq!(country.country_code, 276);
-            },
+            }
         }
     }
 
@@ -166,7 +175,7 @@ mod tests {
             Some(country) => {
                 assert_eq!(country.code, "DEU");
                 assert_eq!(country.country_code, 276);
-            },
+            }
         }
     }
 

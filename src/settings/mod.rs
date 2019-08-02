@@ -1,5 +1,5 @@
-use crate::LocaleResult;
 use crate::string::LocaleString;
+use crate::LocaleResult;
 
 pub trait LocaleScope {
     fn get_locale() -> LocaleResult<LocaleString>;

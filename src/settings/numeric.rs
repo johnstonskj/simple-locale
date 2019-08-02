@@ -1,6 +1,6 @@
-use crate::{LocaleError, LocaleResult};
-use crate::string::LocaleString;
 use super::LocaleScope;
+use crate::string::LocaleString;
+use crate::{LocaleError, LocaleResult};
 
 #[derive(Debug, Clone)]
 pub struct NumericSettings {
@@ -27,8 +27,8 @@ impl LocaleScope for NumericScope {
 
 #[cfg(test)]
 mod tests {
-    use crate::LocaleScope;
     use super::NumericScope;
+    use crate::LocaleScope;
 
     #[test]
     fn test_get_locale() {

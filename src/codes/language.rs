@@ -48,23 +48,22 @@ lazy_static! {
 
 pub fn lookup(code: &str) -> Option<&'static LanguageInfo> {
     debug!("language::lookup {}", code);
-    assert!(code.len() == 2 || code.len() == 3, "language code must be either 2, or 3, characters long.");
+    assert!(
+        code.len() == 2 || code.len() == 3,
+        "language code must be either 2, or 3, characters long."
+    );
     match code.len() {
-        3 =>
-            match LANGUAGES.get(code) {
-                Some(v) => Some(v),
-                None => None,
+        3 => match LANGUAGES.get(code) {
+            Some(v) => Some(v),
+            None => None,
+        },
+        2 => match LOOKUP.get(code) {
+            Some(v) => {
+                debug!("language::lookup {} -> {}", code, v);
+                lookup(v)
             }
-        ,
-        2 =>
-            match LOOKUP.get(code) {
-                Some(v) => {
-                    debug!("language::lookup {} -> {}", code, v);
-                    lookup(v)
-                },
-                None => None,
-            }
-        ,
+            None => None,
+        },
         _ => None,
     }
 }
@@ -81,7 +80,10 @@ fn languages_from_json() -> HashMap<String, LanguageInfo> {
     info!("languages_from_json - loading JSON");
     let raw_data = include_bytes!("data/languages.json");
     let language_map: HashMap<String, LanguageInfo> = serde_json::from_slice(raw_data).unwrap();
-    info!("languages_from_json - loaded {} countries", language_map.len());
+    info!(
+        "languages_from_json - loaded {} countries",
+        language_map.len()
+    );
     language_map
 }
 
@@ -93,7 +95,10 @@ fn load_language_lookup() -> HashMap<String, String> {
             lookup_map.insert(short_code.to_string(), language.code.to_string());
         }
     }
-    info!("load_language_lookup - mapped {} countries", lookup_map.len());
+    info!(
+        "load_language_lookup - mapped {} countries",
+        lookup_map.len()
+    );
     lookup_map
 }
 

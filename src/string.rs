@@ -26,10 +26,10 @@ See also:
 * https://docs.microsoft.com/en-us/cpp/c-runtime-library/locale-names-languages-and-country-region-strings?view=vs-2019
 * https://docs.microsoft.com/en-us/windows/win32/intl/locale-names
 */
+use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Display;
 use std::str::FromStr;
-use std::collections::HashMap;
 
 use crate::codes::country;
 use crate::codes::language;
@@ -92,7 +92,7 @@ pub enum CodeSet {
     ISCII_TML,
     ISCII_TE,
     ISCII_TIG,
-    ISO_646, // ASCII
+    ISO_646,  // ASCII
     ISO_6937, // ANSEL
     ISO_8859_1,
     ISO_8859_2,
@@ -188,11 +188,7 @@ impl LocaleString {
     }
 
     pub fn with_territory(&self, territory: String) -> Self {
-        assert_eq!(
-            territory.len(),
-            2,
-            "territory codes are two character only"
-        );
+        assert_eq!(territory.len(), 2, "territory codes are two character only");
         assert_eq!(
             territory.chars().all(|c| c.is_uppercase()),
             true,
@@ -241,7 +237,10 @@ impl LocaleString {
     }
 
     pub fn with_modifiers<K, V>(&self, modifiers: HashMap<K, V>) -> Self
-        where K: Display, V: Display {
+    where
+        K: Display,
+        V: Display,
+    {
         let modifier_strings: Vec<String> = modifiers
             .iter()
             .map(|(key, value)| format!("{}={}", key, value))
@@ -275,125 +274,128 @@ impl LocaleString {
     fn test_known_language(language_code: &String) {
         let lang_key = language_code.clone();
         let result = &language::lookup(&lang_key);
-        assert!(
-            result.is_some(),
-            "language code does not exist"
-        );
+        assert!(result.is_some(), "language code does not exist");
     }
 
     fn test_known_territory(territory: &String) {
         let country_key = territory.clone();
         let result = &country::lookup_country(&country_key);
-        assert!(
-            result.is_some(),
-            "territory code does not exist"
-        );
+        assert!(result.is_some(), "territory code does not exist");
     }
 }
 
 impl Display for LocaleString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", [
-            self.language_code.clone(),
-            match &self.territory {
-                Some(v) => format!("{}{}", SEP_TERRITORY, v),
-                None => "".to_string(),
-            },
-            match &self.code_set {
-                Some(v) => format!("{}{}", SEP_CODE_SET, v),
-                None => "".to_string(),
-            },
-            match &self.modifier {
-                Some(v) => format!("{}{}", SEP_MODIFIER, v),
-                None => "".to_string(),
-            },
-        ].join(""))
+        write!(
+            f,
+            "{}",
+            [
+                self.language_code.clone(),
+                match &self.territory {
+                    Some(v) => format!("{}{}", SEP_TERRITORY, v),
+                    None => "".to_string(),
+                },
+                match &self.code_set {
+                    Some(v) => format!("{}{}", SEP_CODE_SET, v),
+                    None => "".to_string(),
+                },
+                match &self.modifier {
+                    Some(v) => format!("{}{}", SEP_MODIFIER, v),
+                    None => "".to_string(),
+                },
+            ]
+            .join("")
+        )
     }
 }
 
 impl Display for CodeSet {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            CodeSet::ANSEL=> "ANSEL",
-            CodeSet::ArmSCII_7 => "ARMSCII-7",
-            CodeSet::ArmSCII_8=> "ARMSCII-8",
-            CodeSet::ArmSCII_8A=> "ARMSCII-8A",
-            CodeSet::ASCII=> "ASCII",
-            CodeSet::US_ASCII=> "US-ASCII",
-            CodeSet::Big5=> "Big5",
-            CodeSet::Big5_HKSCS=> "Big5HKSCS",
-            CodeSet::CNS_11643 => "CNS11643",
-            CodeSet::CP_866=> "CP866",
-            CodeSet::CP_936=> "CP936",
-            CodeSet::CP_949=> "CP949",
-            CodeSet::CP_1131=> "CP1131",
-            CodeSet::CP_1251=> "CP1251",
-            CodeSet::CP_1386=> "CP1386",
-            CodeSet::EBCDIC=> "EBCDIC",
-            CodeSet::EUC_CN=> "eucCN",
-            CodeSet::EUC_JP=> "eucJP",
-            CodeSet::EUC_KR=> "eucKR",
-            CodeSet::GB_2312=> "GB2312",
-            CodeSet::GBK=> "GBK", // 2312 extension
-            CodeSet::GB_18030=> "GB18030",
-            CodeSet::ISCII=> "ISCII",
-            CodeSet::ISCII_BE=> "ISCII-BE",
-            CodeSet::ISCII_BNG=> "ISCII-BNG",
-            CodeSet::ISCII_DE=> "ISCII-DE",
-            CodeSet::ISCII_DEV=> "ISCII-DEV",
-            CodeSet::ISCII_GU => "ISCII-GU",
-            CodeSet::ISCII_GUJ => "ISCII-GUJ",
-            CodeSet::ISCII_KA=> "ISCII-KA",
-            CodeSet::ISCII_KND=> "ISCII-KND",
-            CodeSet::ISCII_MA=> "ISCII-MA",
-            CodeSet::ISCII_MLM=> "ISCII-MLM",
-            CodeSet::ISCII_OR=> "ISCII-OR",
-            CodeSet::ISCII_ORI=> "ISCII-ORI",
-            CodeSet::ISCII_PE=> "ISCII-PE",
-            CodeSet::ISCII_GUR=> "ISCII-GUR",
-            CodeSet::ISCII_TA=> "ISCII-TA",
-            CodeSet::ISCII_TML=> "ISCII-TML",
-            CodeSet::ISCII_TE=> "ISCII-TE",
-            CodeSet::ISCII_TIG=> "ISCII-TIG",
-            CodeSet::ISO_646 => "ISO646",
-            CodeSet::ISO_6937 => "ISO6937",
-            CodeSet::ISO_8859_1 => "ISO8859-1",
-            CodeSet::ISO_8859_2 => "ISO8859-2",
-            CodeSet::ISO_8859_3 => "ISO8859-3",
-            CodeSet::ISO_8859_4 => "ISO8859-4",
-            CodeSet::ISO_8859_5 => "ISO8859-5",
-            CodeSet::ISO_8859_6 => "ISO8859-6",
-            CodeSet::ISO_8859_7 => "ISO8859-7",
-            CodeSet::ISO_8859_8 => "ISO8859-8",
-            CodeSet::ISO_8859_9 => "ISO8859-9",
-            CodeSet::ISO_8859_10 => "ISO8859-10",
-            CodeSet::ISO_8859_11 => "ISO8859-11",
-            CodeSet::ISO_8859_12 => "ISO8859-12",
-            CodeSet::ISO_8859_13 => "ISO8859-13",
-            CodeSet::ISO_8859_14 => "ISO8859-14",
-            CodeSet::ISO_8859_15 => "ISO8859-15",
-            CodeSet::ISO_8859_16 => "ISO8859-16",
-            CodeSet::ISO_10585 => "ISO10585",
-            CodeSet::ISO_10646 => "ISO10646",
-            CodeSet::KOI7 => "KOI7",
-            CodeSet::KOI8_R => "KOI8-R",
-            CodeSet::KOI8 => "KOI8",
-            CodeSet::KOI8_RU => "KOI8-RU",
-            CodeSet::KOI8_T => "KOI8-T",
-            CodeSet::KOI8_U => "KOI8-U",
-            CodeSet::PASCII => "PASCII",
-            CodeSet::PT154 => "PT154",
-            CodeSet::Shift_JIS => "SJIS",
-            CodeSet::SJIS => "SJIS",
-            CodeSet::TIS_620 => "TIS-620",
-            CodeSet::TSCII => "TSCII",
-            CodeSet::UTF_7 => "UTF-7",
-            CodeSet::UTF_8 => "UTF-8",
-            CodeSet::UTF_16 => "UTF-16",
-            CodeSet::UTF_32 => "UTF-32",
-            CodeSet::VISCII => "VISCII",
-            CodeSet::Other(s) => s,
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                CodeSet::ANSEL => "ANSEL",
+                CodeSet::ArmSCII_7 => "ARMSCII-7",
+                CodeSet::ArmSCII_8 => "ARMSCII-8",
+                CodeSet::ArmSCII_8A => "ARMSCII-8A",
+                CodeSet::ASCII => "ASCII",
+                CodeSet::US_ASCII => "US-ASCII",
+                CodeSet::Big5 => "Big5",
+                CodeSet::Big5_HKSCS => "Big5HKSCS",
+                CodeSet::CNS_11643 => "CNS11643",
+                CodeSet::CP_866 => "CP866",
+                CodeSet::CP_936 => "CP936",
+                CodeSet::CP_949 => "CP949",
+                CodeSet::CP_1131 => "CP1131",
+                CodeSet::CP_1251 => "CP1251",
+                CodeSet::CP_1386 => "CP1386",
+                CodeSet::EBCDIC => "EBCDIC",
+                CodeSet::EUC_CN => "eucCN",
+                CodeSet::EUC_JP => "eucJP",
+                CodeSet::EUC_KR => "eucKR",
+                CodeSet::GB_2312 => "GB2312",
+                CodeSet::GBK => "GBK", // 2312 extension
+                CodeSet::GB_18030 => "GB18030",
+                CodeSet::ISCII => "ISCII",
+                CodeSet::ISCII_BE => "ISCII-BE",
+                CodeSet::ISCII_BNG => "ISCII-BNG",
+                CodeSet::ISCII_DE => "ISCII-DE",
+                CodeSet::ISCII_DEV => "ISCII-DEV",
+                CodeSet::ISCII_GU => "ISCII-GU",
+                CodeSet::ISCII_GUJ => "ISCII-GUJ",
+                CodeSet::ISCII_KA => "ISCII-KA",
+                CodeSet::ISCII_KND => "ISCII-KND",
+                CodeSet::ISCII_MA => "ISCII-MA",
+                CodeSet::ISCII_MLM => "ISCII-MLM",
+                CodeSet::ISCII_OR => "ISCII-OR",
+                CodeSet::ISCII_ORI => "ISCII-ORI",
+                CodeSet::ISCII_PE => "ISCII-PE",
+                CodeSet::ISCII_GUR => "ISCII-GUR",
+                CodeSet::ISCII_TA => "ISCII-TA",
+                CodeSet::ISCII_TML => "ISCII-TML",
+                CodeSet::ISCII_TE => "ISCII-TE",
+                CodeSet::ISCII_TIG => "ISCII-TIG",
+                CodeSet::ISO_646 => "ISO646",
+                CodeSet::ISO_6937 => "ISO6937",
+                CodeSet::ISO_8859_1 => "ISO8859-1",
+                CodeSet::ISO_8859_2 => "ISO8859-2",
+                CodeSet::ISO_8859_3 => "ISO8859-3",
+                CodeSet::ISO_8859_4 => "ISO8859-4",
+                CodeSet::ISO_8859_5 => "ISO8859-5",
+                CodeSet::ISO_8859_6 => "ISO8859-6",
+                CodeSet::ISO_8859_7 => "ISO8859-7",
+                CodeSet::ISO_8859_8 => "ISO8859-8",
+                CodeSet::ISO_8859_9 => "ISO8859-9",
+                CodeSet::ISO_8859_10 => "ISO8859-10",
+                CodeSet::ISO_8859_11 => "ISO8859-11",
+                CodeSet::ISO_8859_12 => "ISO8859-12",
+                CodeSet::ISO_8859_13 => "ISO8859-13",
+                CodeSet::ISO_8859_14 => "ISO8859-14",
+                CodeSet::ISO_8859_15 => "ISO8859-15",
+                CodeSet::ISO_8859_16 => "ISO8859-16",
+                CodeSet::ISO_10585 => "ISO10585",
+                CodeSet::ISO_10646 => "ISO10646",
+                CodeSet::KOI7 => "KOI7",
+                CodeSet::KOI8_R => "KOI8-R",
+                CodeSet::KOI8 => "KOI8",
+                CodeSet::KOI8_RU => "KOI8-RU",
+                CodeSet::KOI8_T => "KOI8-T",
+                CodeSet::KOI8_U => "KOI8-U",
+                CodeSet::PASCII => "PASCII",
+                CodeSet::PT154 => "PT154",
+                CodeSet::Shift_JIS => "SJIS",
+                CodeSet::SJIS => "SJIS",
+                CodeSet::TIS_620 => "TIS-620",
+                CodeSet::TSCII => "TSCII",
+                CodeSet::UTF_7 => "UTF-7",
+                CodeSet::UTF_8 => "UTF-8",
+                CodeSet::UTF_16 => "UTF-16",
+                CodeSet::UTF_32 => "UTF-32",
+                CodeSet::VISCII => "VISCII",
+                CodeSet::Other(s) => s,
+            }
+        )
     }
 }
 
@@ -411,25 +413,25 @@ impl FromStr for LocaleString {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.len() == 0 {
-            return Err(ParseError::EmptyString)
+            return Err(ParseError::EmptyString);
         }
         let (mut locale, remaining) = match s.find(|c: char| SEP_ALL.contains(c)) {
             None => return Ok(LocaleString::new(s.to_string())),
-            Some(i) => {
-                ( LocaleString::new(s[..i].to_string()), &s[i..] )
-            }
+            Some(i) => (LocaleString::new(s[..i].to_string()), &s[i..]),
         };
         let mut remaining = remaining;
         while remaining.len() > 0 {
             let separator = remaining.chars().nth(0).unwrap();
             remaining = &remaining[1..];
             match remaining.find(|c: char| SEP_ALL.contains(c)) {
-                None => return match separator {
-                    SEP_TERRITORY => Err(ParseError::InvalidCountryCode),
-                    SEP_CODE_SET => Err(ParseError::InvalidCodeSet),
-                    SEP_MODIFIER => Err(ParseError::InvalidModifier),
-                    _ => panic!("this shouldn't happen"),
-                },
+                None => {
+                    return match separator {
+                        SEP_TERRITORY => Err(ParseError::InvalidCountryCode),
+                        SEP_CODE_SET => Err(ParseError::InvalidCodeSet),
+                        SEP_MODIFIER => Err(ParseError::InvalidModifier),
+                        _ => panic!("this shouldn't happen"),
+                    }
+                }
                 Some(i) => {
                     let field = &remaining[..i];
                     remaining = &remaining[i..];
@@ -450,7 +452,7 @@ impl FromStr for LocaleString {
 mod tests {
     use std::collections::HashMap;
 
-    use super::{LocaleString, CodeSet};
+    use super::{CodeSet, LocaleString};
 
     #[test]
     #[should_panic(expected = "language codes are two character only")]
@@ -467,15 +469,13 @@ mod tests {
     #[test]
     #[should_panic(expected = "territory codes are two character only")]
     fn test_bad_country_length() {
-        LocaleString::new("en".to_string())
-            .with_territory("USA".to_string());
+        LocaleString::new("en".to_string()).with_territory("USA".to_string());
     }
 
     #[test]
     #[should_panic(expected = "territory codes are upper case only")]
     fn test_bad_country_case() {
-        LocaleString::new("en".to_string())
-            .with_territory("us".to_string());
+        LocaleString::new("en".to_string()).with_territory("us".to_string());
     }
 
     #[test]
@@ -517,7 +517,9 @@ mod tests {
     fn test_with_code_set_string() {
         let locale = LocaleString::new("en".to_string());
         assert_eq!(
-            locale.with_code_set_string("UTF-8".to_string()).get_code_set(),
+            locale
+                .with_code_set_string("UTF-8".to_string())
+                .get_code_set(),
             Some("UTF-8".to_string())
         );
     }
@@ -526,7 +528,9 @@ mod tests {
     fn test_with_modifier() {
         let locale = LocaleString::new("en".to_string());
         assert_eq!(
-            locale.with_modifier("collation=pinyin;currency=CNY".to_string()).get_modifier(),
+            locale
+                .with_modifier("collation=pinyin;currency=CNY".to_string())
+                .get_modifier(),
             Some("collation=pinyin;currency=CNY".to_string())
         );
     }
@@ -534,19 +538,18 @@ mod tests {
     #[test]
     fn test_with_modifiers() {
         let locale = LocaleString::new("en".to_string());
-        let modifiers: HashMap<&str, &str> = [
-            ("collation", "pinyin"),
-            ("currency", "CNY")
-            ]
+        let modifiers: HashMap<&str, &str> = [("collation", "pinyin"), ("currency", "CNY")]
             .iter()
             .cloned()
             .collect();
-        assert!(
-            locale.with_modifiers(modifiers).get_modifier().unwrap().contains("collation=pinyin")
-        );
-//        assert!(
-//            locale.with_modifiers(modifiers).get_modifier().unwrap().contains("currency=CNY")
-//        );
+        assert!(locale
+            .with_modifiers(modifiers)
+            .get_modifier()
+            .unwrap()
+            .contains("collation=pinyin"));
+        //        assert!(
+        //            locale.with_modifiers(modifiers).get_modifier().unwrap().contains("currency=CNY")
+        //        );
     }
 
     #[test]
@@ -574,6 +577,9 @@ mod tests {
             .with_territory("US".to_string())
             .with_code_set(CodeSet::UTF_8)
             .with_modifier("collation=pinyin;currency=CNY".to_string());
-        assert_eq!(locale.to_string(), "en_US.UTF-8@collation=pinyin;currency=CNY".to_string());
+        assert_eq!(
+            locale.to_string(),
+            "en_US.UTF-8@collation=pinyin;currency=CNY".to_string()
+        );
     }
 }

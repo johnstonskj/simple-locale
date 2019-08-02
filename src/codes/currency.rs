@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Subdivision {
     pub exponent: i8,
-    pub name: Option<String>
+    pub name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -32,7 +32,11 @@ lazy_static! {
 }
 
 pub fn lookup_by_alpha(alphabetic_code: &str) -> Option<&'static CurrencyInfo> {
-    assert_eq!(alphabetic_code.len(), 3, "currency code must be 3 characters long");
+    assert_eq!(
+        alphabetic_code.len(),
+        3,
+        "currency code must be 3 characters long"
+    );
     CURRENCIES.get(alphabetic_code)
 }
 
@@ -54,9 +58,8 @@ pub fn currency_numeric_codes() -> Vec<u16> {
 pub fn currencies_for_country_name(name: &str) -> Vec<&'static CurrencyInfo> {
     CURRENCIES
         .values()
-        .filter(|currency|
-            currency.standards_entities.contains(&name.to_string())
-        ).collect()
+        .filter(|currency| currency.standards_entities.contains(&name.to_string()))
+        .collect()
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -67,7 +70,10 @@ fn currencies_from_json() -> HashMap<String, CurrencyInfo> {
     info!("currencies_from_json - loading JSON");
     let raw_data = include_bytes!("data/currencies.json");
     let currency_map: HashMap<String, CurrencyInfo> = serde_json::from_slice(raw_data).unwrap();
-    info!("currencies_from_json - loaded {} currencies", currency_map.len());
+    info!(
+        "currencies_from_json - loaded {} currencies",
+        currency_map.len()
+    );
     currency_map
 }
 
@@ -79,7 +85,10 @@ fn load_currency_lookup() -> HashMap<u16, String> {
             lookup_map.insert(*numeric, currency.alphabetic_code.to_string());
         }
     }
-    info!("load_currency_lookup - mapped {} countries", lookup_map.len());
+    info!(
+        "load_currency_lookup - mapped {} countries",
+        lookup_map.len()
+    );
     lookup_map
 }
 

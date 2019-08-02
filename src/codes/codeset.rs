@@ -8,10 +8,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CodesetInfo {
-    code: String,
+    name: String,
     also_known_as: Vec<String>,
-    standards_entity: Option<String>,
-    description: Option<String>,
+    mid_code: u32,
+    source: Option<String>,
+    references: Option<String>,
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -22,9 +23,9 @@ lazy_static! {
     static ref CODESETS: HashMap<String, CodesetInfo> = codesets_from_json();
 }
 
-pub fn lookup(code: &str) -> Option<&'static CodesetInfo> {
-    assert!(code.len() > 0, "codeset code may not be empty");
-    CODESETS.get(code)
+pub fn lookup(name: &str) -> Option<&'static CodesetInfo> {
+    assert!(name.len() > 0, "codeset name may not be empty");
+    CODESETS.get(name)
 }
 
 // ------------------------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub struct CodesetInfo {
     name: String,
     also_known_as: Vec<String>,
-    mid_code: u32,
+    mib_code: u32,
     source: Option<String>,
     references: Option<String>,
 }

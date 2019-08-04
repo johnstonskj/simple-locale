@@ -15,7 +15,7 @@ def read_data():
         character_sets.append({
             'name': row.Name,
             'aliases': re.split("\n+", str(row.Aliases)),
-            'mid_code': row.MIBenum,
+            'mib_code': row.MIBenum,
             'source': squish(un_newline(row.Source)),
             'reference': squish(un_newline(row.Reference))
         })
@@ -30,7 +30,7 @@ def write_data(character_sets, people, out_path):
                 ','.join([
                     '"name":"%s"' % cinfo['name'],
                     '"also_known_as":%s' % vector(cinfo['aliases']),
-                    '"mid_code":%s' % cinfo['mid_code'],
+                    '"mib_code":%s' % cinfo['mib_code'],
                     '"source":%s' % optional_str(unquote(cinfo['source'])),
                     '"reference":%s' %  optional_str(unquote(cinfo['reference']))
                 ])),

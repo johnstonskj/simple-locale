@@ -22,3 +22,4 @@ unrelated languages may share the same or similar name.
 The data files `iso-639-3*.tab` were sourced from
 [SIL International](https://iso639-3.sil.org/code_tables/download_tables).
 
+See also: [native names for languages](https://www.omniglot.com/language/names.htm).

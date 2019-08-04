@@ -1,4 +1,4 @@
-# ISO 4217:2015 - Currency codes
+# ISO 639 - Codes for the representation of names of languages
 
 These codes are widely used in many different disciplines, for example for 
 bibliographic purposes, in the library community, as well as for computerized 

@@ -1,3 +1,19 @@
+/*!
+Codes for the representation of currencies.
+
+Currencies can be represented in the code in two ways: a three-letter alphabetic
+code and a three-digit numeric code. The most recent edition is ISO 4217:2015.
+The purpose of ISO 4217:2015 is to establish internationally recognised codes
+for the representation of currencies.
+
+## Source - ISO 4217:2015
+
+The data used here is taken from the tables in the html page
+[ISO.org](https://www.iso.org/iso-4217-currency-codes.html). Additional data was taken from
+[Forex](https://www.forexrealm.com/additional-info/foreign-currency-symbols.html),
+and [XE](https://www.xe.com/symbols.php).
+*/
+
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};

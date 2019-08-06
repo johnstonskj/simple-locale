@@ -1,3 +1,20 @@
+/*!
+_Codes for the representation of names of countries and their subdivisions.
+
+The purpose of ISO 3166 is to define internationally recognised codes
+of letters and/or numbers that we can use when we refer to countries
+and subdivisions. However, it does not define the names of countries
+– this information comes from United Nations sources (Terminology
+Bulletin Country Names and the Country and Region Codes for Statistical
+Use maintained by the United Nations Statistics Divisions).
+
+## Source - ISO 3166
+
+The data used here is taken from the page
+[Github](https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes).
+
+*/
+
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
@@ -7,7 +24,7 @@ use serde::{Deserialize, Serialize};
 // ------------------------------------------------------------------------------------------------
 
 #[derive(Debug)]
-pub struct Region {
+pub struct RegionInfo {
     pub code: u16,
     pub name: String,
 }
@@ -27,12 +44,12 @@ pub struct CountryInfo {
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref REGIONS: HashMap<u16, Region> = load_regions_from_json();
+    static ref REGIONS: HashMap<u16, RegionInfo> = load_regions_from_json();
     static ref COUNTRIES: HashMap<String, CountryInfo> = load_countries_from_json();
     static ref LOOKUP: HashMap<String, String> = load_country_lookup();
 }
 
-pub fn lookup_region(code: u16) -> Option<&'static Region> {
+pub fn lookup_region(code: u16) -> Option<&'static RegionInfo> {
     info!("lookup_region: {}", code);
     match REGIONS.get(&code) {
         Some(v) => Some(v),
@@ -77,7 +94,7 @@ pub fn country_codes() -> Vec<String> {
 // Generated Data
 // ------------------------------------------------------------------------------------------------
 
-fn load_regions_from_json() -> HashMap<u16, Region> {
+fn load_regions_from_json() -> HashMap<u16, RegionInfo> {
     info!("load_regions_from_json - loading JSON");
     let raw_data = include_bytes!("data/regions.json");
     let raw_map: HashMap<String, String> = serde_json::from_slice(raw_data).unwrap();
@@ -86,7 +103,7 @@ fn load_regions_from_json() -> HashMap<u16, Region> {
         .map(|(code, name)| {
             (
                 code.parse::<u16>().unwrap(),
-                Region {
+                RegionInfo {
                     code: code.parse::<u16>().unwrap(),
                     name: name.to_string(),
                 },

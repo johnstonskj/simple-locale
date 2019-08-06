@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# README:
+#
+#   The `ffi` module has a sub module for each supported O/S (curently only Mac)
+#   and each of these contains the same four bindings; `langinfo`, `localcharset`,
+#   `locale`, and `xlocale`. In this way the interface to the library above
+#   is always the same and bindings have not yet needed to be edited in any
+#   way.
+
 case $(uname) in
   Darwin)
     if [[ $(command -v llvm-config) ]] ; then
@@ -7,9 +15,9 @@ case $(uname) in
       BIND_HEADERS=langinfo,localcharset,locale,xlocale
       MODULE=macos
       else
-        echo "llvm not installed, or not on the path"
-        echo ">> brew install llvm"
-        echo ">> PATH=\$PATH:/usr/local/opt/llvm/bin"
+        echo "llvm not installed, or not on the path, try:"
+        echo "$ brew install llvm"
+        echo "$ PATH=\$PATH:/usr/local/opt/llvm/bin"
         exit 2
       fi
     ;;

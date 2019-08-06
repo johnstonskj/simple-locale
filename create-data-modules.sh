@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# README:
+#
+#   Each folder under `src-data` represents a single standard, which may
+#   generate one or more data sets. Each directory will contain a Python
+#   script, `generate.py` which is called by the top-level script to create
+#   the JSON in the correct location. Each should also contain a README
+#   that includes attribution for any data retrieved to make this possible.
+
 if [[ "$1" = "" ]] ; then
   echo "Error: needs to specify output location as argument"
   exit 1

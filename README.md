@@ -2,11 +2,18 @@
 
 An idiomatic Rust crate for locale, and locale-like, operations.
 
-This crate consists of three major capabilities;
+This crate provides a higher-level interface to a number of locale-related
+sources, in three areas:
 
-1. `Locale` and `LocaleString` ...
-2. codes ...
-3. settings ...
+1. Locale-related codes/identifiers and any standards-based information
+   concerning them. For example, ISO-396 language identifiers, or ISO-3166
+   country identifiers. These are under the module `simple_locale::codes`.
+1. Locale settings, usually accessed via POSIX (see
+   [ISO/IEC 15897](https://www.iso.org/standard/50707.html) operating system
+   functions. These are under the module `simple_locale::settings`.
+1. A `Locale` enumeration, and a `LocaleString` structure are provided
+   that may be used to parse and construct locale identifiers in
+   a standards-conformant manner.
 
 ## Example
 
@@ -42,13 +49,7 @@ As mentioned above, this crate depends on FFI bindings to POSIX locale
 functions, and there are O/S differences that make this a pain. The script
 [`create-bindings.sh`](https://github.com/johnstonskj/simple-locale/blob/master/create-bindings.sh)
 is used to generate these bindings (using cargo bindgen) in such a way that
-different O/S bindings can be built and switched between.
-
-The `ffi` module has a sub module for each supported O/S (curently only Mac)
-and each of these contains the same four bindings; `langinfo`, `localcharset`,
-`locale`, and `xlocale`. In this way the interface to the library above 
-is always the same and bindings have not yet needed to be edited in any
-way.
+different O/S bindings can be built effectively.
 
 ### JSON Data Files
 
@@ -69,8 +70,3 @@ Currently data is generated for the following standards:
 * ISO 15924 _Codes for the representation of names of scripts_; alphabetic 
   and numeric codes supported.
 
-Each folder under `src-data` represents a single standard, which may 
-generate one or more data sets. Each directory will contain a Python
-script, `generate.py` which is called by the top-level script to create
-the JSON in the correct location. Each should also contain a README
-that includes attribution for any data retrieved to make this possible.

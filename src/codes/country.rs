@@ -25,17 +25,21 @@ use serde::{Deserialize, Serialize};
 /// A representation of registered country data maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CountryInfo {
-    /// The ISO-3166, part 2, 3-character identifier of the country.
+    /// The ISO-3166, part 2, 3-character identifier of the country. This
+    /// is the primary identifier.
     pub code: String,
-    /// The ISO-3166, part 1, 2-character code of the country.
+    /// The ISO-3166, part 1, 2-character identifier of the country.
     pub short_code: String,
     /// The numeric code for the `RegionInfo` that represents the country.
     pub country_code: u16,
-    /// The optional numeric code for the `RegionInfo` that represents the region.
+    /// The optional numeric code for the `RegionInfo` that represents the
+    /// region.
     pub region_code: Option<u16>,
-    /// The optional numeric code for the `RegionInfo` that represents the sub-region.
+    /// The optional numeric code for the `RegionInfo` that represents the
+    /// sub-region.
     pub sub_region_code: Option<u16>,
-    /// The optional numeric code for the `RegionInfo` that represents the intermediate region.
+    /// The optional numeric code for the `RegionInfo` that represents the
+    /// intermediate region.
     pub intermediate_region_code: Option<u16>,
 }
 

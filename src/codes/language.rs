@@ -36,13 +36,17 @@ use serde::{Deserialize, Serialize};
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+/// The ISO 639 data identifies 3 classes of languages, each language is
+/// one of these classes only.
 #[derive(Serialize, Deserialize, Debug)]
-pub enum LanguageScope {
+pub enum LanguageClass {
     Individual,
     MacroLanguage,
     Special,
 }
 
+/// The type of the language in this this meaning is more concerning it's
+/// current usage.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum LanguageType {
     Ancient,
@@ -56,15 +60,21 @@ pub enum LanguageType {
 /// A representation of registered language data maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LanguageInfo {
+    /// The ISO 3-character language identifier
     pub code: String,
+    /// The reference name, in English, used by the standard.
     pub reference_name: String,
+    /// The indigenous name, if captured in the standard.
     pub indigenous_name: Option<String>,
+    /// Common aliases.
     pub other_names: Option<Vec<String>>,
     pub bibliographic_code: Option<String>,
     pub terminology_code: Option<String>,
     pub short_code: Option<String>,
-    pub scope: LanguageScope,
+    pub class: LanguageClass,
     pub l_type: LanguageType,
+    /// if `class` is `LanguageClass::MacroLanguage` this is
+    /// a vector of family members of this language.
     pub family_members: Option<Vec<String>>,
 }
 

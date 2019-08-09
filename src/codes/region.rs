@@ -1,5 +1,5 @@
 /*!
-_Codes for the representation of names of countries and their subdivisions.
+Codes for the representation of names of countries and their subdivisions.
 
 The purpose of ISO 3166 is to define internationally recognised codes
 of letters and/or numbers that we can use when we refer to countries

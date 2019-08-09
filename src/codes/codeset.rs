@@ -29,9 +29,9 @@ use serde::{Deserialize, Serialize};
 /// A representation of registrered character set data that maintained by IANA.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CodesetInfo {
-    /// The name (not code) for this code set.
+    /// The name, not a code, for this code set.
     pub name: String,
-    /// Any well known aliases for this ode set.
+    /// Any well known aliases for this code set.
     pub also_known_as: Vec<String>,
     /// The IANA registered MIB code.
     pub mib_code: u32,

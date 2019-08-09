@@ -38,9 +38,13 @@ use serde::{Deserialize, Serialize};
 /// A representation of registered script data maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ScriptInfo {
+    /// The standard 3-character identifier for this script.
     pub alphabetic_code: String,
+    /// The standard numeric identifier for this script.
     pub numeric_code: u16,
+    /// The script name, in English.
     pub name: String,
+    /// An optional alias for this script.
     pub alias: Option<String>,
 }
 

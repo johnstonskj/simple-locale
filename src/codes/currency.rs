@@ -25,23 +25,32 @@ use serde::{Deserialize, Serialize};
 /// Represents a sub-division (minor currency unit) of a currency.
 /// For example, the US Dollar (USD) has a single sub-division in that
 /// each 100th of a dollar is named a cent. This would be represented
-/// as `Subdivision
+/// as `Subdivision { exponent: 2, name: Somme("cent") }`. Some
+/// currencies have different names for different subdivisionsm, or simply
+/// different names for the same.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Subdivision {
     /// The exponent, or scale, of the currency unit, determining it's value.
     pub exponent: i8,
-    /// The optional name of the currency unit.
+    /// The optional name of the currency unit, localized.
     pub name: Option<String>,
 }
 
 /// A representation of registered currency data that maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CurrencyInfo {
+    /// The  ISO 4217 registered 3-character currency code.
     pub alphabetic_code: String,
+    /// The registered name, in English, of the currency.
     pub name: String,
+    /// The registered numeric curency code, if it has one.
     pub numeric_code: Option<u16>,
+    /// The localized symbol used to represent the currency, if known.
     pub symbol: Option<String>,
+    /// These correspond approximately to _countries using
+    ///this currency_.
     pub standards_entities: Vec<String>,
+    /// The, possibly empty set of subdivisions for this currency.
     pub subdivisions: Vec<Subdivision>,
 }
 

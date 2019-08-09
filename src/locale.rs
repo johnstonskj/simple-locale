@@ -22,15 +22,19 @@ the separate enumeration values.
 use simple_locale::locale::Locale;
 use std::str::FromStr;
 
-let locale = Locale::from_str("C");
-assert_eq!(locale.to_string(), "POSIX");
+match Locale::from_str("C") {
+    Ok(Locale::POSIX) => (),
+    _ => panic!("could not parse first locale string")
+}
 
 let locale = Locale::from_str("en_US.UTF-8@Latn");
-if let Locate::String(locate_str) = locale {
-    assert_eq!(locale_str.get_language(), "en".to_string());
-    assert_eq!(locale_str.get_territory(), Ok("US".to_string()));
-    assert_eq!(locale_str.get_code_set(), Ok("en".to_string()));
-    assert_eq!(locale_str.get_modifer(), Ok("en".to_string()));
+if let Ok(Locale::String(locale_str)) = locale {
+    assert_eq!(locale_str.get_language_code(), "en".to_string());
+    assert_eq!(locale_str.get_territory().unwrap(), "US".to_string());
+    assert_eq!(locale_str.get_code_set().unwrap(), "UTF-8".to_string());
+    assert_eq!(locale_str.get_modifier().unwrap(), "Latn".to_string());
+} else {
+    panic!("could not parse second locale string")
 }
 ```
 
@@ -45,13 +49,13 @@ use std::env;
 
 if let Ok(lc_str) = env::var("LC_ALL") {
     match Locale::from_str(&lc_str) {
-        Some(Locale::POSIX) =>
+        Ok(Locale::POSIX) =>
             println!("POSIX minimal locale"),
-        Some(Locale::Path(p)) =>
+        Ok(Locale::Path(p)) =>
             println!("Path locale"),
-        Some(Locale::String(s)) =>
+        Ok(Locale::String(s)) =>
             println!("String locale"),
-        _ => "Parse Error",
+        _ => panic!("Parse Error"),
     }
 }
 
@@ -111,8 +115,14 @@ impl FromStr for Locale {
             return Err(ParseError::EmptyString);
         }
         match s {
-            L_C  => Ok(Locale::POSIX),
-            L_POSIX => Ok(Locale::POSIX),
+            L_C  => {
+                println!("got C");
+                Ok(Locale::POSIX)
+            },
+            L_POSIX => {
+                println!("got POSIX");
+                Ok(Locale::POSIX)
+            },
             _ => {
                 if s.starts_with("/") {
                     match PathBuf::from_str(s) {

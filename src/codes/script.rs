@@ -35,12 +35,13 @@ use serde::{Deserialize, Serialize};
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+/// A representation of registered script data maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ScriptInfo {
-    alphabetic_code: String,
-    numeric_code: u16,
-    name: String,
-    alias: Option<String>,
+    pub alphabetic_code: String,
+    pub numeric_code: u16,
+    pub name: String,
+    pub alias: Option<String>,
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -48,8 +49,8 @@ pub struct ScriptInfo {
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref SCRIPTS: HashMap<String, ScriptInfo> = scripts_from_json();
-    static ref NUMERIC_LOOKUP: HashMap<u16, String> = load_script_lookup();
+    static ref SCRIPTS: HashMap<String, ScriptInfo> = load_scripts_from_json();
+    static ref NUMERIC_LOOKUP: HashMap<u16, String> = make_script_lookup();
 }
 
 pub fn lookup_by_alpha(alphabetic_code: &str) -> Option<&'static ScriptInfo> {
@@ -64,11 +65,11 @@ pub fn lookup_by_numeric(numeric_code: &u16) -> Option<&'static ScriptInfo> {
     }
 }
 
-pub fn script_alpha_codes() -> Vec<String> {
+pub fn all_alpha_codes() -> Vec<String> {
     SCRIPTS.keys().cloned().collect()
 }
 
-pub fn script_numeric_codes() -> Vec<u16> {
+pub fn all_numeric_codes() -> Vec<u16> {
     NUMERIC_LOOKUP.keys().cloned().collect()
 }
 
@@ -76,7 +77,7 @@ pub fn script_numeric_codes() -> Vec<u16> {
 // Generated Data
 // ------------------------------------------------------------------------------------------------
 
-fn scripts_from_json() -> HashMap<String, ScriptInfo> {
+fn load_scripts_from_json() -> HashMap<String, ScriptInfo> {
     info!("scripts_from_json - loading JSON");
     let raw_data = include_bytes!("data/scripts.json");
     let script_map: HashMap<String, ScriptInfo> = serde_json::from_slice(raw_data).unwrap();
@@ -84,7 +85,7 @@ fn scripts_from_json() -> HashMap<String, ScriptInfo> {
     script_map
 }
 
-fn load_script_lookup() -> HashMap<u16, String> {
+fn make_script_lookup() -> HashMap<u16, String> {
     info!("load_script_lookup - create from SCRIPTS");
     let mut lookup_map: HashMap<u16, String> = HashMap::new();
     for script in SCRIPTS.values() {
@@ -149,9 +150,9 @@ mod tests {
 
     #[test]
     fn test_script_codes() {
-        let codes = script_alpha_codes();
+        let codes = all_alpha_codes();
         assert!(codes.len() > 0);
-        let numerics = script_numeric_codes();
+        let numerics = all_numeric_codes();
         assert!(numerics.len() > 0);
     }
 }

@@ -1,5 +1,5 @@
 /*!
-_Codes for the representation of names of countries and their subdivisions.
+Codes for the representation of names of countries and their subdivisions.
 
 The purpose of ISO 3166 is to define internationally recognised codes
 of letters and/or numbers that we can use when we refer to countries
@@ -12,7 +12,6 @@ Use maintained by the United Nations Statistics Divisions).
 
 The data used here is taken from the page
 [Github](https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes).
-
 */
 
 use std::collections::HashMap;
@@ -23,19 +22,20 @@ use serde::{Deserialize, Serialize};
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
-#[derive(Debug)]
-pub struct RegionInfo {
-    pub code: u16,
-    pub name: String,
-}
-
+/// A representation of registered country data maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CountryInfo {
+    /// The ISO-3166, part 2, 3-character identifier of the country.
     pub code: String,
+    /// The ISO-3166, part 1, 2-character code of the country.
     pub short_code: String,
+    /// The numeric code for the `RegionInfo` that represents the country.
     pub country_code: u16,
+    /// The optional numeric code for the `RegionInfo` that represents the region.
     pub region_code: Option<u16>,
+    /// The optional numeric code for the `RegionInfo` that represents the sub-region.
     pub sub_region_code: Option<u16>,
+    /// The optional numeric code for the `RegionInfo` that represents the intermediate region.
     pub intermediate_region_code: Option<u16>,
 }
 
@@ -44,20 +44,11 @@ pub struct CountryInfo {
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref REGIONS: HashMap<u16, RegionInfo> = load_regions_from_json();
     static ref COUNTRIES: HashMap<String, CountryInfo> = load_countries_from_json();
-    static ref LOOKUP: HashMap<String, String> = load_country_lookup();
+    static ref LOOKUP: HashMap<String, String> = make_country_lookup();
 }
 
-pub fn lookup_region(code: u16) -> Option<&'static RegionInfo> {
-    info!("lookup_region: {}", code);
-    match REGIONS.get(&code) {
-        Some(v) => Some(v),
-        None => None,
-    }
-}
-
-pub fn lookup_country(code: &str) -> Option<&'static CountryInfo> {
+pub fn lookup(code: &str) -> Option<&'static CountryInfo> {
     debug!("lookup_country: {}", code);
     assert!(
         code.len() == 2 || code.len() == 3,
@@ -74,7 +65,7 @@ pub fn lookup_country(code: &str) -> Option<&'static CountryInfo> {
         2 => {
             debug!("lookup_country: 2-character code");
             match LOOKUP.get(code) {
-                Some(v) => lookup_country(v),
+                Some(v) => lookup(v),
                 None => None,
             }
         }
@@ -82,35 +73,13 @@ pub fn lookup_country(code: &str) -> Option<&'static CountryInfo> {
     }
 }
 
-pub fn region_codes() -> Vec<u16> {
-    REGIONS.keys().cloned().collect()
-}
-
-pub fn country_codes() -> Vec<String> {
+pub fn all_codes() -> Vec<String> {
     COUNTRIES.keys().cloned().collect()
 }
 
 // ------------------------------------------------------------------------------------------------
 // Generated Data
 // ------------------------------------------------------------------------------------------------
-
-fn load_regions_from_json() -> HashMap<u16, RegionInfo> {
-    info!("load_regions_from_json - loading JSON");
-    let raw_data = include_bytes!("data/regions.json");
-    let raw_map: HashMap<String, String> = serde_json::from_slice(raw_data).unwrap();
-    raw_map
-        .iter()
-        .map(|(code, name)| {
-            (
-                code.parse::<u16>().unwrap(),
-                RegionInfo {
-                    code: code.parse::<u16>().unwrap(),
-                    name: name.to_string(),
-                },
-            )
-        })
-        .collect()
-}
 
 fn load_countries_from_json() -> HashMap<String, CountryInfo> {
     info!("load_countries_from_json - loading JSON");
@@ -123,7 +92,7 @@ fn load_countries_from_json() -> HashMap<String, CountryInfo> {
     country_map
 }
 
-fn load_country_lookup() -> HashMap<String, String> {
+fn make_country_lookup() -> HashMap<String, String> {
     info!("load_country_lookup - create from COUNTRIES");
     let mut lookup_map: HashMap<String, String> = HashMap::new();
     for country in COUNTRIES.values() {
@@ -146,37 +115,14 @@ mod tests {
 
     // --------------------------------------------------------------------------------------------
     #[test]
-    fn test_region_codes() {
-        let codes = region_codes();
-        assert!(codes.len() > 0);
-    }
-
-    #[test]
-    fn test_good_region_code() {
-        match lookup_region(21) {
-            None => panic!("was expecting a region"),
-            Some(region) => assert_eq!(region.name, "Northern America"),
-        }
-    }
-
-    #[test]
-    fn test_bad_region_code() {
-        match lookup_region(0) {
-            None => (),
-            Some(_) => panic!("was expecting a None in response"),
-        }
-    }
-
-    // --------------------------------------------------------------------------------------------
-    #[test]
     fn test_country_codes() {
-        let codes = country_codes();
+        let codes = all_codes();
         assert!(codes.len() > 0);
     }
 
     #[test]
     fn test_good_country_code() {
-        match lookup_country("DEU") {
+        match lookup("DEU") {
             None => panic!("was expecting a country"),
             Some(country) => {
                 assert_eq!(country.short_code, "DE");
@@ -187,7 +133,7 @@ mod tests {
 
     #[test]
     fn test_good_country_short_code() {
-        match lookup_country("DE") {
+        match lookup("DE") {
             None => panic!("was expecting a country"),
             Some(country) => {
                 assert_eq!(country.code, "DEU");
@@ -198,7 +144,7 @@ mod tests {
 
     #[test]
     fn test_bad_country_code() {
-        match lookup_country("XXX") {
+        match lookup("XXX") {
             None => (),
             Some(_) => panic!("was expecting a None in response"),
         }

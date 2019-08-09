@@ -32,14 +32,14 @@ least some reasonable use cases.
    [`CountryInfo`](codes/country/struct.CountryInfo.html) struct) identified
    by the ISO-3166, part 2, 3-character identifier.
 1. The data fromn the last call contains one or more regions (in the
-   [`RegionInfo`](/codes/country/struct.RegionInfo.html) struct), determine
+   [`RegionInfo`](/codes/region/struct.RegionInfo.html) struct), determine
    the countries name from the `country_code`.
 1. Now we have the country name we can lookup the details of the currencies
    (in, the [`CurrencyInfo`](CurrencyInfo) struct).
 
 ```
 use simple_locale::LocaleString;
-use simple_locale::codes::{country, currency};
+use simple_locale::codes::{country, currency, region};
 
 let locale = LocaleString::new_strict("en".to_string())
     .with_territory("US".to_string())
@@ -47,10 +47,10 @@ let locale = LocaleString::new_strict("en".to_string())
     .with_modifier("collation=pinyin;currency=CNY".to_string());
 println!("{}", locale);
 
-let mexico = country::lookup_country("MEX").unwrap();
+let mexico = country::lookup("MEX").unwrap();
 println!("{:?}", mexico);
 
-let mexico_region = country::lookup_region(mexico.country_code).unwrap();
+let mexico_region = region::lookup(mexico.country_code).unwrap();
 println!("{:?}", mexico_region);
 
 let currencies = currency::currencies_for_country_name(mexico_region.name.as_str());

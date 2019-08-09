@@ -25,19 +25,17 @@ For example, Australian English using the UTF-8 encoding is `en_AU.UTF-8`.
   * Sometimes this is used to indicate the language script in use, as such values from
     [ISO 15924](http://unicode.org/iso15924/iso15924-codes.html) should be used.
 
-is the name registered by the MIT X Consortium that identifies the registration authority that owns the specific encoding. A modifier may be added to the registered name but is not required. The modifier is of the form @codeset modifier and identifies the coded character set as defined by that registration authority.
-
 See also:
 
-* https://www.gnu.org/software/libc/manual/html_node/Locale-Names.html
-* https://developer.apple.com/documentation/foundation/nslocale/1416263-localeidentifier
-* https://developer.apple.com/documentation/foundation/nslocale
-* https://docs.microsoft.com/en-us/cpp/c-runtime-library/locale-names-languages-and-country-region-strings?view=vs-2019
-* https://docs.microsoft.com/en-us/windows/win32/intl/locale-names
-* https://en.wikipedia.org/wiki/Locale_(computer_software)
-* https://en.wikipedia.org/wiki/IETF_language_tag (https://tools.ietf.org/html/bcp47)
-* https://www.w3.org/TR/ltli/
-* https://en.wikipedia.org/wiki/ISO/IEC_15897 (https://www.iso.org/standard/50707.html, http://www.open-std.org/jtc1/sc22/wg20/docs/n610.pdf)
+* [Wikipedia _Locale_](https://en.wikipedia.org/wiki/Locale_(computer_software))
+* [GNU C Library - _Locale-Names_](https://www.gnu.org/software/libc/manual/html_node/Locale-Names.html)
+* [Apple - _NSLocale_](https://developer.apple.com/documentation/foundation/nslocale) and
+  [_localeIdentifier_](https://developer.apple.com/documentation/foundation/nslocale/1416263-localeidentifier)
+* [Microsoft C Runtime - _Locale names, Languages, and Country/Region strings_](https://docs.microsoft.com/en-us/cpp/c-runtime-library/locale-names-languages-and-country-region-strings?view=vs-2019)
+* [Microsoft Windows - _Locale Names_](https://docs.microsoft.com/en-us/windows/win32/intl/locale-names)
+* [IETF _Tags for Identifying Languages_](https://tools.ietf.org/html/bcp47)
+* [W3C _Language Tags and Locale Identifiers for the World Wide Web_](https://www.w3.org/TR/ltli/)
+* [ISO _Procedures for the registration of cultural elements_](https://www.iso.org/standard/50707.html)
 
 */
 use std::collections::HashMap;
@@ -45,13 +43,15 @@ use std::fmt;
 use std::fmt::Display;
 use std::str::FromStr;
 
-use crate::codes::country;
-use crate::codes::language;
+use regex::Regex;
+
+use crate::codes::{country, language};
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+#[derive(Debug)]
 pub struct LocaleString {
     strict: bool,
     language_code: String,
@@ -63,6 +63,7 @@ pub struct LocaleString {
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
     EmptyString,
+    RegexFailure,
     InvalidLanguageCode,
     InvalidCountryCode,
     InvalidCodeSet,
@@ -77,8 +78,6 @@ pub enum ParseError {
 const SEP_TERRITORY: char = '_';
 const SEP_CODE_SET: char = '.';
 const SEP_MODIFIER: char = '@';
-
-const SEP_ALL: &'static str = "_.@";
 
 impl LocaleString {
     pub fn new(language_code: String) -> Self {
@@ -217,7 +216,7 @@ impl LocaleString {
 
     fn test_known_territory(territory: &String) {
         let country_key = territory.clone();
-        let result = &country::lookup_country(&country_key);
+        let result = &country::lookup(&country_key);
         assert!(result.is_some(), "territory code does not exist");
     }
 }
@@ -251,39 +250,32 @@ impl FromStr for LocaleString {
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s.len() == 0 {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(
+                r"^([a-z][a-z]+)(_[A-Z][A-Z]+)?(\.[A-Z][a-zA-Z0-9\-_]+)?(@\w+)?$"
+            ).unwrap();
+        }
+
+        if s.is_empty() {
             return Err(ParseError::EmptyString);
         }
-        let (mut locale, remaining) = match s.find(|c: char| SEP_ALL.contains(c)) {
-            None => return Ok(LocaleString::new(s.to_string())),
-            Some(i) => (LocaleString::new(s[..i].to_string()), &s[i..]),
-        };
-        let mut remaining = remaining;
-        while remaining.len() > 0 {
-            let separator = remaining.chars().nth(0).unwrap();
-            remaining = &remaining[1..];
-            match remaining.find(|c: char| SEP_ALL.contains(c)) {
-                None => {
-                    return match separator {
-                        SEP_TERRITORY => Err(ParseError::InvalidCountryCode),
-                        SEP_CODE_SET => Err(ParseError::InvalidCodeSet),
-                        SEP_MODIFIER => Err(ParseError::InvalidModifier),
-                        _ => panic!("this shouldn't happen"),
-                    }
+
+        match RE.captures(s) {
+            None => Err(ParseError::RegexFailure),
+            Some(groups) => {
+                let mut locale = LocaleString::new(groups.get(1).unwrap().as_str().to_string());
+                if let Some(group_str) = groups.get(2) {
+                    locale = locale.with_territory(group_str.as_str()[1..].to_string());
                 }
-                Some(i) => {
-                    let field = &remaining[..i];
-                    remaining = &remaining[i..];
-                    match separator {
-                        SEP_TERRITORY => locale = locale.with_territory(field.to_string()),
-                        SEP_CODE_SET => locale = locale.with_code_set(field.to_string()),
-                        SEP_MODIFIER => locale = locale.with_modifier(field.to_string()),
-                        _ => panic!("this shouldn't happen"),
-                    }
+                if let Some(group_str) = groups.get(3) {
+                    locale = locale.with_code_set(group_str.as_str()[1..].to_string());
                 }
+                if let Some(group_str) = groups.get(4) {
+                    locale = locale.with_modifier(group_str.as_str()[1..].to_string());
+                }
+                Ok(locale)
             }
         }
-        Err(ParseError::EmptyString)
     }
 }
 
@@ -294,9 +286,11 @@ impl FromStr for LocaleString {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::str::FromStr;
 
     use super::LocaleString;
 
+    // --------------------------------------------------------------------------------------------
     #[test]
     #[should_panic(expected = "language codes are two character only")]
     fn test_bad_constructor_length() {
@@ -321,6 +315,7 @@ mod tests {
         LocaleString::new("en".to_string()).with_territory("us".to_string());
     }
 
+    // --------------------------------------------------------------------------------------------
     #[test]
     fn test_constructor() {
         let locale = LocaleString::new("en".to_string());
@@ -384,6 +379,7 @@ mod tests {
         //        );
     }
 
+    // --------------------------------------------------------------------------------------------
     #[test]
     #[should_panic(expected = "language code does not exist")]
     fn test_strict_bad_language() {
@@ -403,8 +399,9 @@ mod tests {
         assert_eq!(locale.get_language_code(), "aa".to_string());
     }
 
+    // --------------------------------------------------------------------------------------------
     #[test]
-    fn test_lc_string() {
+    fn test_to_string() {
         let locale = LocaleString::new("en".to_string())
             .with_territory("US".to_string())
             .with_code_set("UTF-8".to_string())
@@ -413,5 +410,51 @@ mod tests {
             locale.to_string(),
             "en_US.UTF-8@collation=pinyin;currency=CNY".to_string()
         );
+    }
+
+    // --------------------------------------------------------------------------------------------
+    #[test]
+    fn test_from_str_1() {
+        match LocaleString::from_str("en") {
+            Ok(locale) =>
+                assert_eq!(locale.get_language_code(), "en"),
+            _ => panic!("LocaleString::from_str failure")
+        }
+    }
+
+    #[test]
+    fn test_from_str_2() {
+        match LocaleString::from_str("en_US") {
+            Ok(locale) => {
+                assert_eq!(locale.get_language_code(), "en");
+                assert_eq!(locale.get_territory(), Some("US".to_string()));
+            },
+            _ => panic!("LocaleString::from_str failure")
+        }
+    }
+
+    #[test]
+    fn test_from_str_3() {
+        match LocaleString::from_str("en_US.UTF-8") {
+            Ok(locale) => {
+                assert_eq!(locale.get_language_code(), "en");
+                assert_eq!(locale.get_territory(), Some("US".to_string()));
+                assert_eq!(locale.get_code_set(), Some("UTF-8".to_string()));
+            },
+            _ => panic!("LocaleString::from_str failure")
+        }
+    }
+
+    #[test]
+    fn test_from_str_4() {
+        match LocaleString::from_str("en_US.UTF-8@Latn") {
+            Ok(locale) => {
+                assert_eq!(locale.get_language_code(), "en");
+                assert_eq!(locale.get_territory(), Some("US".to_string()));
+                assert_eq!(locale.get_code_set(), Some("UTF-8".to_string()));
+                assert_eq!(locale.get_modifier(), Some("Latn".to_string()));
+            },
+            _ => panic!("LocaleString::from_str failure")
+        }
     }
 }

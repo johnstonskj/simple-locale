@@ -1,5 +1,5 @@
 use super::LocaleScope;
-use crate::string::LocaleString;
+use crate::locale::Locale;
 use crate::{LocaleError, LocaleResult};
 
 #[derive(Debug, Clone)]
@@ -12,11 +12,11 @@ pub struct NumericSettings {
 pub struct NumericScope {}
 
 impl LocaleScope for NumericScope {
-    fn get_locale() -> LocaleResult<LocaleString> {
-        Ok(LocaleString::new("en".to_string()))
+    fn get_locale() -> LocaleResult<Locale> {
+        Ok(Locale::POSIX)
     }
 
-    fn set_locale(_locale: LocaleString) -> LocaleResult<()> {
+    fn set_locale(_locale: Locale) -> LocaleResult<()> {
         Ok(())
     }
 

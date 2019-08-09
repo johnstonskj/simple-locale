@@ -22,12 +22,19 @@ use serde::{Deserialize, Serialize};
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+/// Represents a sub-division (minor currency unit) of a currency.
+/// For example, the US Dollar (USD) has a single sub-division in that
+/// each 100th of a dollar is named a cent. This would be represented
+/// as `Subdivision
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Subdivision {
+    /// The exponent, or scale, of the currency unit, determining it's value.
     pub exponent: i8,
+    /// The optional name of the currency unit.
     pub name: Option<String>,
 }
 
+/// A representation of registered currency data that maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CurrencyInfo {
     pub alphabetic_code: String,
@@ -43,8 +50,8 @@ pub struct CurrencyInfo {
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref CURRENCIES: HashMap<String, CurrencyInfo> = currencies_from_json();
-    static ref NUMERIC_LOOKUP: HashMap<u16, String> = load_currency_lookup();
+    static ref CURRENCIES: HashMap<String, CurrencyInfo> = load_currencies_from_json();
+    static ref NUMERIC_LOOKUP: HashMap<u16, String> = make_currency_lookup();
 }
 
 pub fn lookup_by_alpha(alphabetic_code: &str) -> Option<&'static CurrencyInfo> {
@@ -78,11 +85,19 @@ pub fn currencies_for_country_name(name: &str) -> Vec<&'static CurrencyInfo> {
         .collect()
 }
 
+pub fn all_alpha_codes() -> Vec<String> {
+    CURRENCIES.keys().cloned().collect()
+}
+
+pub fn all_numeric_codes() -> Vec<u16> {
+    NUMERIC_LOOKUP.keys().cloned().collect()
+}
+
 // ------------------------------------------------------------------------------------------------
 // Generated Data
 // ------------------------------------------------------------------------------------------------
 
-fn currencies_from_json() -> HashMap<String, CurrencyInfo> {
+fn load_currencies_from_json() -> HashMap<String, CurrencyInfo> {
     info!("currencies_from_json - loading JSON");
     let raw_data = include_bytes!("data/currencies.json");
     let currency_map: HashMap<String, CurrencyInfo> = serde_json::from_slice(raw_data).unwrap();
@@ -93,7 +108,7 @@ fn currencies_from_json() -> HashMap<String, CurrencyInfo> {
     currency_map
 }
 
-fn load_currency_lookup() -> HashMap<u16, String> {
+fn make_currency_lookup() -> HashMap<u16, String> {
     info!("load_currency_lookup - create from CURRENCIES");
     let mut lookup_map: HashMap<u16, String> = HashMap::new();
     for currency in CURRENCIES.values() {

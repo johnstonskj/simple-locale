@@ -25,9 +25,7 @@ unrelated languages may share the same or similar name.
 The data used here is taken from
 [SIL International](https://iso639-3.sil.org/code_tables/download_tables).
 
-**See also**
-
-* [Native names for languages](https://www.omniglot.com/language/names.htm).
+See also: [Native names for languages](https://www.omniglot.com/language/names.htm).
 */
 
 use std::collections::HashMap;
@@ -55,6 +53,7 @@ pub enum LanguageType {
     Special,
 }
 
+/// A representation of registered language data maintained by ISO.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LanguageInfo {
     pub code: String,
@@ -74,8 +73,8 @@ pub struct LanguageInfo {
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref LANGUAGES: HashMap<String, LanguageInfo> = languages_from_json();
-    static ref LOOKUP: HashMap<String, String> = load_language_lookup();
+    static ref LANGUAGES: HashMap<String, LanguageInfo> = load_languages_from_json();
+    static ref LOOKUP: HashMap<String, String> = make_language_lookup();
 }
 
 pub fn lookup(code: &str) -> Option<&'static LanguageInfo> {
@@ -100,7 +99,7 @@ pub fn lookup(code: &str) -> Option<&'static LanguageInfo> {
     }
 }
 
-pub fn language_codes() -> Vec<String> {
+pub fn all_codes() -> Vec<String> {
     LANGUAGES.keys().cloned().collect()
 }
 
@@ -108,7 +107,7 @@ pub fn language_codes() -> Vec<String> {
 // Generated Data
 // ------------------------------------------------------------------------------------------------
 
-fn languages_from_json() -> HashMap<String, LanguageInfo> {
+fn load_languages_from_json() -> HashMap<String, LanguageInfo> {
     info!("languages_from_json - loading JSON");
     let raw_data = include_bytes!("data/languages.json");
     let language_map: HashMap<String, LanguageInfo> = serde_json::from_slice(raw_data).unwrap();
@@ -119,7 +118,7 @@ fn languages_from_json() -> HashMap<String, LanguageInfo> {
     language_map
 }
 
-fn load_language_lookup() -> HashMap<String, String> {
+fn make_language_lookup() -> HashMap<String, String> {
     info!("load_language_lookup - create from COUNTRIES");
     let mut lookup_map: HashMap<String, String> = HashMap::new();
     for language in LANGUAGES.values() {

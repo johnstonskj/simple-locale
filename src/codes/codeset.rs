@@ -14,9 +14,7 @@ encouraged.
 The data used here is taken from the tables in the html page
 [IANA](https://www.iana.org/assignments/character-sets/character-sets.xhtml).
 
-**See also**
-
-* [RFC-2978](https://tools.ietf.org/html/rfc2978) IANA Charset
+See also: [RFC-2978](https://tools.ietf.org/html/rfc2978) IANA Charset
 Registration Procedures.
 */
 
@@ -28,13 +26,19 @@ use serde::{Deserialize, Serialize};
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+/// A representation of registrered character set data that maintained by IANA.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CodesetInfo {
-    name: String,
-    also_known_as: Vec<String>,
-    mib_code: u32,
-    source: Option<String>,
-    references: Option<String>,
+    /// The name (not code) for this code set.
+    pub name: String,
+    /// Any well known aliases for this ode set.
+    pub also_known_as: Vec<String>,
+    /// The IANA registered MIB code.
+    pub mib_code: u32,
+    /// Sources identified in the IANA registration.
+    pub source: Option<String>,
+    /// References identified in the IANA registration.
+    pub references: Option<String>,
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -42,24 +46,34 @@ pub struct CodesetInfo {
 // ------------------------------------------------------------------------------------------------
 
 lazy_static! {
-    static ref CODESETS: HashMap<String, CodesetInfo> = codesets_from_json();
+    static ref CODESETS: HashMap<String, CodesetInfo> = load_code_sets_from_json();
 }
 
+/// Lookup a `CodesetInfo` based on it's name, returning `None` if the name
+/// does not exist in the current IANA data set.
 pub fn lookup(name: &str) -> Option<&'static CodesetInfo> {
     assert!(name.len() > 0, "codeset name may not be empty");
     CODESETS.get(name)
+}
+
+/// Return all the registered script names.
+pub fn all_names() -> Vec<String> {
+    CODESETS.keys().cloned().collect()
 }
 
 // ------------------------------------------------------------------------------------------------
 // Generated Data
 // ------------------------------------------------------------------------------------------------
 
-fn codesets_from_json() -> HashMap<String, CodesetInfo> {
-    info!("codesets_from_json - loading JSON");
+fn load_code_sets_from_json() -> HashMap<String, CodesetInfo> {
+    info!("load_code_sets_from_json - loading JSON");
     let raw_data = include_bytes!("data/codesets.json");
-    let codeset_map: HashMap<String, CodesetInfo> = serde_json::from_slice(raw_data).unwrap();
-    info!("codesets_from_json - loaded {} codesets", codeset_map.len());
-    codeset_map
+    let code_set_map: HashMap<String, CodesetInfo> = serde_json::from_slice(raw_data).unwrap();
+    info!(
+        "load_code_sets_from_json - loaded {} codes ets",
+        code_set_map.len()
+    );
+    code_set_map
 }
 
 // ------------------------------------------------------------------------------------------------

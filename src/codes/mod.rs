@@ -10,7 +10,8 @@ from other publicly accessible sources.
 Modules typically implement a `lookup()` function (although where some standards
 have both alphabetic and numeric identifiers there are `lookup_by_alpha()` and
 `lookup_by_numeric()` instead) that returns an `Option`. Most will also include
-a function `get_codes()` to get all the known identifiers.
+a function `all_codes()` (or `all_alpha_codes()` and `all_numeric_codes()`) to
+get all the known identifiers.
 
 Some standards, specifically language and country, support 2-character and
 3-character alphabetic identifiers, a single `lookup()` function is used to
@@ -28,5 +29,7 @@ pub mod country;
 pub mod currency;
 
 pub mod language;
+
+pub mod region;
 
 pub mod script;

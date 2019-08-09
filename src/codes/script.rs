@@ -54,7 +54,11 @@ lazy_static! {
 }
 
 pub fn lookup_by_alpha(alphabetic_code: &str) -> Option<&'static ScriptInfo> {
-    assert_eq!(alphabetic_code.len(), 4, "script code is expected to be 3 characters");
+    assert_eq!(
+        alphabetic_code.len(),
+        4,
+        "script code is expected to be 3 characters"
+    );
     SCRIPTS.get(alphabetic_code)
 }
 
@@ -92,10 +96,7 @@ fn make_script_lookup() -> HashMap<u16, String> {
         println!("{} -> {}", &script.numeric_code, &script.alphabetic_code);
         lookup_map.insert(script.numeric_code, script.alphabetic_code.to_string());
     }
-    info!(
-        "load_script_lookup - mapped {} countries",
-        lookup_map.len()
-    );
+    info!("load_script_lookup - mapped {} countries", lookup_map.len());
     lookup_map
 }
 
@@ -116,7 +117,7 @@ mod tests {
                 assert_eq!(script.alphabetic_code.to_string(), "Hluw".to_string());
                 assert_eq!(script.numeric_code, 80);
                 //assert_eq!(script.alias.unwrap().to_string(), "Anatolian_Hieroglyphs".to_string())
-            },
+            }
         }
     }
 
@@ -136,7 +137,7 @@ mod tests {
                 assert_eq!(script.alphabetic_code.to_string(), "Hluw".to_string());
                 assert_eq!(script.numeric_code, 80);
                 //assert_eq!(script.alias.unwrap().to_string(), "Anatolian_Hieroglyphs".to_string())
-            },
+            }
         }
     }
 

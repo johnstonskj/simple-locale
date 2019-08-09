@@ -60,7 +60,6 @@ if let Ok(lc_str) = env::var("LC_ALL") {
 }
 
 ```
-
 */
 
 use std::fmt;
@@ -78,11 +77,13 @@ use crate::string::{LocaleString, ParseError};
 /// commonly used by operating systems.
 #[derive(Debug)]
 pub enum Locale {
-    /// The minimal locale specified by POSIX.
+    /// The minimal locale specified by POSIX. Can be spoecified with
+    /// the string "POSIX" or simply "C".
     POSIX,
-    /// A path to a locale specification.
+    /// A path to a locale specification, this library does not vslidste
+    /// whether the path exists, simply that it is a valid `PathBuf`..
     Path(PathBuf),
-    /// A locale string, parsed into a structred form.
+    /// A locale string, parsed into a structured `LocaleString` form.
     String(LocaleString),
 }
 
@@ -92,6 +93,7 @@ pub enum Locale {
 
 const L_C: &'static str = "C";
 const L_POSIX: &'static str = "POSIX";
+const L_PATH_SEP: &'static str = "/";
 
 impl Display for Locale {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -115,16 +117,10 @@ impl FromStr for Locale {
             return Err(ParseError::EmptyString);
         }
         match s {
-            L_C  => {
-                println!("got C");
-                Ok(Locale::POSIX)
-            },
-            L_POSIX => {
-                println!("got POSIX");
-                Ok(Locale::POSIX)
-            },
+            L_C => Ok(Locale::POSIX),
+            L_POSIX => Ok(Locale::POSIX),
             _ => {
-                if s.starts_with("/") {
+                if s.starts_with(L_PATH_SEP) {
                     match PathBuf::from_str(s) {
                         Ok(p) => Ok(Locale::Path(p)),
                         Err(_) => Err(ParseError::InvalidPath),
@@ -132,7 +128,7 @@ impl FromStr for Locale {
                 } else {
                     Ok(Locale::String(LocaleString::from_str(s)?))
                 }
-            },
+            }
         }
     }
 }
@@ -148,18 +144,18 @@ mod tests {
     use super::*;
 
     // --------------------------------------------------------------------------------------------
-    # [test]
+    #[test]
     fn test_posix_to_string() {
         assert_eq!(Locale::POSIX.to_string(), "POSIX");
     }
 
-    # [test]
+    #[test]
     fn test_path_to_string() {
         let _path = PathBuf::from_str("/usr/share/locale/en_US");
-//        assert_eq!(path.to_string(), "/usr/share/locale/en_US");
+        //        assert_eq!(path.to_string(), "/usr/share/locale/en_US");
     }
 
-    # [test]
+    #[test]
     fn test_string_to_string() {
         let locale = LocaleString::new("en".to_string())
             .with_territory("US".to_string())
@@ -168,28 +164,27 @@ mod tests {
     }
 
     // --------------------------------------------------------------------------------------------
-    # [test]
+    #[test]
     fn test_posix_from_string() {
         match Locale::from_str("POSIX") {
             Ok(Locale::POSIX) => (),
-            _ => panic!("expecting Locale::POSIX")
+            _ => panic!("expecting Locale::POSIX"),
         }
         match Locale::from_str("C") {
             Ok(Locale::POSIX) => (),
-            _ => panic!("expecting Locale::POSIX (C)")
+            _ => panic!("expecting Locale::POSIX (C)"),
         }
     }
 
-    # [test]
+    #[test]
     fn test_path_from_string() {
         match Locale::from_str("/usr/share/locale/en_US") {
-            Ok(Locale::Path(p)) =>
-                assert_eq!(p.to_str(), Some("/usr/share/locale/en_US")),
-            _ => panic!("expecting Locale::Path")
+            Ok(Locale::Path(p)) => assert_eq!(p.to_str(), Some("/usr/share/locale/en_US")),
+            _ => panic!("expecting Locale::Path"),
         }
     }
 
-    # [test]
+    #[test]
     fn test_string_from_string() {
         println!("{:#?}", Locale::from_str("en_US.UTF-8"));
         match Locale::from_str("en_US.UTF-8") {
@@ -197,8 +192,8 @@ mod tests {
                 assert_eq!(ls.get_language_code(), "en");
                 assert_eq!(ls.get_territory(), Some("US".to_string()));
                 assert_eq!(ls.get_code_set(), Some("UTF-8".to_string()));
-            },
-            _ => panic!("expecting Locale::String")
+            }
+            _ => panic!("expecting Locale::String"),
         }
     }
 }

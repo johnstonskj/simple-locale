@@ -251,9 +251,9 @@ impl FromStr for LocaleString {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         lazy_static! {
-            static ref RE: Regex = Regex::new(
-                r"^([a-z][a-z]+)(_[A-Z][A-Z]+)?(\.[A-Z][a-zA-Z0-9\-_]+)?(@\w+)?$"
-            ).unwrap();
+            static ref RE: Regex =
+                Regex::new(r"^([a-z][a-z]+)(_[A-Z][A-Z]+)?(\.[A-Z][a-zA-Z0-9\-_]+)?(@\w+)?$")
+                    .unwrap();
         }
 
         if s.is_empty() {
@@ -416,9 +416,8 @@ mod tests {
     #[test]
     fn test_from_str_1() {
         match LocaleString::from_str("en") {
-            Ok(locale) =>
-                assert_eq!(locale.get_language_code(), "en"),
-            _ => panic!("LocaleString::from_str failure")
+            Ok(locale) => assert_eq!(locale.get_language_code(), "en"),
+            _ => panic!("LocaleString::from_str failure"),
         }
     }
 
@@ -428,8 +427,8 @@ mod tests {
             Ok(locale) => {
                 assert_eq!(locale.get_language_code(), "en");
                 assert_eq!(locale.get_territory(), Some("US".to_string()));
-            },
-            _ => panic!("LocaleString::from_str failure")
+            }
+            _ => panic!("LocaleString::from_str failure"),
         }
     }
 
@@ -440,8 +439,8 @@ mod tests {
                 assert_eq!(locale.get_language_code(), "en");
                 assert_eq!(locale.get_territory(), Some("US".to_string()));
                 assert_eq!(locale.get_code_set(), Some("UTF-8".to_string()));
-            },
-            _ => panic!("LocaleString::from_str failure")
+            }
+            _ => panic!("LocaleString::from_str failure"),
         }
     }
 
@@ -453,8 +452,8 @@ mod tests {
                 assert_eq!(locale.get_territory(), Some("US".to_string()));
                 assert_eq!(locale.get_code_set(), Some("UTF-8".to_string()));
                 assert_eq!(locale.get_modifier(), Some("Latn".to_string()));
-            },
-            _ => panic!("LocaleString::from_str failure")
+            }
+            _ => panic!("LocaleString::from_str failure"),
         }
     }
 }

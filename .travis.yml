@@ -41,13 +41,13 @@ script:
 - $CARGO_CI/bin/cargo-lint.sh
 
 # Deployment script, this is under test
-deploy:
-  provider: script
-  on:
-    tags: true
-    all_branches: true
-    condition: "$TRAVIS_RUST_VERSION = stable && $TRAVIS_OS_NAME = linux && $CARGO_DEPLOY = 1"
-  script: $CARGO_CI/bin/cargo-publish.sh
+#deploy:
+#  provider: script
+#  on:
+#    tags: true
+#    all_branches: true
+#    condition: "$TRAVIS_RUST_VERSION = stable && $TRAVIS_OS_NAME = linux && $CARGO_DEPLOY = 1"
+#  script: $CARGO_CI/bin/cargo-publish.sh
 
 # Only initiate build on master or tag branches
 branches:

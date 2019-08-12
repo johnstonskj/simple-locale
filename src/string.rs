@@ -63,6 +63,7 @@ pub struct LocaleString {
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
     EmptyString,
+    PosixUnsupported,
     RegexFailure,
     InvalidLanguageCode,
     InvalidCountryCode,
@@ -258,6 +259,10 @@ impl FromStr for LocaleString {
 
         if s.is_empty() {
             return Err(ParseError::EmptyString);
+        }
+
+        if s == "C" || s == "POSIX" {
+            return Err(ParseError::PosixUnsupported);
         }
 
         match RE.captures(s) {

@@ -103,11 +103,14 @@ extern crate regex;
 // ------------------------------------------------------------------------------------------------
 
 /// Common error type for functions in this crate.
+#[derive(Debug)]
 pub enum LocaleError {
     /// The provided locale string was badly formatted
     InvalidLocaleString,
     /// The provided locale was unknown
     UnknownLocale,
+    /// Locale category not set/or supported
+    UnsetCategory,
     /// The operation you tried to perform was not supported.
     Unsupported,
 }
@@ -128,7 +131,6 @@ pub mod locale;
 pub use locale::Locale;
 
 pub mod settings;
-pub use settings::LocaleScope;
 
 // ------------------------------------------------------------------------------------------------
 // Internal Modules

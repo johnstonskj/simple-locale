@@ -51,7 +51,7 @@ use crate::codes::{country, language};
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct LocaleString {
     strict: bool,
     language_code: String,

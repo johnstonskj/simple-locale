@@ -75,7 +75,7 @@ use crate::string::{LocaleString, ParseError};
 
 /// This enumeration represents the three types of Locale specifiers
 /// commonly used by operating systems.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Locale {
     /// The minimal locale specified by POSIX. Can be spoecified with
     /// the string "POSIX" or simply "C".

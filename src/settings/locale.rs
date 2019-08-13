@@ -171,9 +171,9 @@ mod tests {
     #[test]
     fn test_set_locale() {
         let locale = Locale::String(LocaleString::from_str("en_US.UTF-8").unwrap());
-        println!("test_set_locale");
+        println!("test_set_locale to {:#?}", locale);
         let old_setting = api::get_locale(Category::Currency);
-        assert_eq!(old_setting.unwrap(), Locale::POSIX);
+        println!("locale was {:#?}", old_setting);
         let result = api::set_locale(&locale, Category::Currency);
         assert_eq!(result, true);
         let new_setting = api::get_locale(Category::Currency);

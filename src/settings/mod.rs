@@ -18,6 +18,8 @@ pub mod locale;
 
 pub mod currency;
 
+pub mod messages;
+
 pub mod numeric;
 
 pub mod time;

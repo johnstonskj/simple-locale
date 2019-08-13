@@ -15,3 +15,5 @@ All submodules of `ffi` are generated with bindgen using a wrapper script
 pub(crate) mod macos;
 #[cfg(target_os = "macos")]
 pub use macos::{langinfo, localcharset, locale, xlocale};
+
+pub(crate) mod utils;

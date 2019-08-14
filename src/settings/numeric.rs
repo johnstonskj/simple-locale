@@ -1,3 +1,11 @@
+/*!
+Fetch locale-specific number formatting settings.
+
+This module provides basic formatting rules for most rational
+numbers; floating point numbers in scientific notation, fractional
+numbers, and imaginary numbers are not covered.
+*/
+
 use crate::ffi::locale::localeconv;
 use crate::ffi::utils::*;
 
@@ -5,12 +13,18 @@ use crate::ffi::utils::*;
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
+/// Numeric formatting settings.
 #[derive(Debug, Clone)]
 pub struct NumericFormat {
+    /// The symbol to use for positive values.
     pub positive_sign: String,
+    /// The symbol to use for negative values.
     pub negative_sign: String,
-    pub decimal_separator: String,
-    pub thousands_separator: String,
+    /// The radix character.
+    pub decimal_separator: String, // TODO: is radix_character better?
+    /// The separator between groups.
+    pub thousands_separator: String, // TODO: is group_separator better?
+    /// The grouping rules.
     pub grouping: Vec<usize>,
 }
 
@@ -18,6 +32,7 @@ pub struct NumericFormat {
 // Public Functions
 // ------------------------------------------------------------------------------------------------
 
+/// Fetch the numeric formatting settings for the current locale.
 pub fn get_numeric_format() -> NumericFormat {
     unsafe {
         let lconv = localeconv();
@@ -31,19 +46,34 @@ pub fn get_numeric_format() -> NumericFormat {
     }
 }
 
+#[cfg(experimental)]
+pub mod fmt {
+    use std::fmt::Display;
+
+    pub fn format<T>(value: T) -> String
+        where T: Display {
+        let initial = value.to_string();
+        if initial.chars().all(|c| c.is_digit(10) || c == '.') {
+            initial
+        } else {
+            panic!("doesn't look like a nunber");
+        }
+    }
+}
+
 // ------------------------------------------------------------------------------------------------
 // Unit Tests
 // ------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
-    use crate::Locale;
-    use crate::settings::locale::Category;
-    use crate::settings::locale::api::*;
     use super::*;
+    use crate::settings::locale::api::*;
+    use crate::settings::locale::Category;
+    use crate::Locale;
 
     // --------------------------------------------------------------------------------------------
-    # [test]
+    #[test]
     fn test_numeric_settings() {
         if get_locale(Category::Currency).unwrap() == Locale::POSIX {
             let format = get_numeric_format();

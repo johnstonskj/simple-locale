@@ -70,7 +70,16 @@ pub fn get_date_time_format() -> DateTimeFormat {
         era_date_time_format: get_nl_string(langinfo::ERA_D_T_FMT),
         era_date_format: get_nl_string(langinfo::ERA_D_FMT),
         era_time_format: get_nl_string(langinfo::ERA_T_FMT),
-        month_day_order: None, // TODO: get_nl_string(langinfo::D_MD_ORDER),
+        month_day_order: match get_nl_string(langinfo::D_MD_ORDER) {
+            Some(s) => if s == "md".to_string() {
+                Some(MonthDayOrder::MonthDay)
+            } else if s == "dm".to_string() {
+                Some(MonthDayOrder::DayMonth)
+            } else {
+                None
+            },
+            _ => None,
+        },
     }
 }
 

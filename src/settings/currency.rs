@@ -1,115 +1,40 @@
-/*!
-Fetch locale-specific currency formatting settings.
-
-The formatting information here does include the currency symbol,
-_international symbol_, and precision all of which overlap with the
-`symbol`, `alphabetic_code`, and subdivision `exponent` from the
-`codes::currency` module. However, there is significantly more
-information here and this should be used wherever necessary to
-format currency values correctly.
-
-However, values from the currency code can be used, for example the
-name and subdivision name(s), when labeling currency values.
-
-## Example
-
-The following should display "19 US Dollars and 99 cents".
-
-```
-use std::str::FromStr;
-use simple_locale::{Locale, LocaleString};
-use simple_locale::codes::currency;
-use simple_locale::settings::locale::Category;
-use simple_locale::settings::locale::api::*;
-use simple_locale::settings::currency::get_currency_format;
-
-let amount: f64 = 19.9950;
-let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
-if set_locale(&Locale::String(en_us), Category::Currency) {
-    let format = get_currency_format();
-    let currency = currency::lookup_by_alpha(&format.international_format.unwrap().currency_symbol.trim()).unwrap();
-    let local = format.local_format.unwrap();
-    let subdiv = currency.subdivisions.get(0).unwrap();
-    let subdiv_name = &subdiv.name.clone().unwrap();
-    println!(
-        "{0} {2} and {1:.4$} {3}",
-        amount.trunc(),
-        amount.fract(),
-        currency.name,
-        subdiv_name,
-        local.decimal_precision
-    );
-}
-```
-*/
-
+use std::os::raw::c_char;
 use crate::ffi::locale::localeconv;
 use crate::ffi::utils::*;
 use crate::settings::numeric::NumericFormat;
-use std::os::raw::c_char;
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
-/// This enumeration defines the handling of sign placement and
-/// choice for either positive or negative numeric values. The
-/// examples for each use a value of minus 999.99.
-///
-/// Note that one format that cannot be easily represented here
-/// is the often used spreadsheet _accounting format_ where the
-/// numeric part of the value is right aligned but currency symbols
-/// are left aligned in a cell and parenthesis are used to denote
-/// negatives but again the opening parenthesis is left aligned and
-/// the closing parenthesis is right aligned.
 #[derive(Debug, Clone, PartialEq)]
 pub enum SignLocation {
-    /// Use parenthesis `($999.99)` around the value to denote sign.
     UseParenthesis,
-    /// Place a symbol before the value `$-999.99`.
     BeforeString,
-    /// Place a symbol after the value `$999.99-`.
     AfterString,
-    /// Place a symbol before the currency sign `-$999.99`.
     BeforeCurrencySymbol,
-    /// Place a symbol after the currency sign `$-999.99`.
     AfterCurrencySymbol,
 }
 
-/// This denotes the complete handling of sign placement for
-/// a currency value.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SignFormat {
-    /// The currency symbol precedes (or follows) the numeric value.
     pub currency_symbol_precedes: bool,
-    /// A space separates the numeric value and currency symbol.
     pub space_separated: bool,
-    /// Placement of the sign symbol.
     pub sign_location: SignLocation,
 }
 
-/// The actual formatting specification for the currency-specific
-/// part of a value.
 #[derive(Debug, Clone, PartialEq)]
 pub struct CurrencyCellFormat {
-    /// currency symbol to use.
     pub currency_symbol: String,
-    /// number of digits of precision typically used.
     pub decimal_precision: usize,
-    /// The correct way to display positive values.
     pub positive_sign_format: SignFormat,
-    /// The correct way to display negative values.
     pub negative_sign_format: SignFormat,
 }
 
-/// The complete currency formatting rules.
 #[derive(Debug, Clone)]
 pub struct CurrencyFormat {
-    /// Numeric handling, we reuse this.
     pub number_format: NumericFormat,
-    /// Formatting values in its native locale.
     pub local_format: Option<CurrencyCellFormat>,
-    /// Formatting a value outside its native locale.
     pub international_format: Option<CurrencyCellFormat>,
 }
 
@@ -117,13 +42,11 @@ pub struct CurrencyFormat {
 // Public Functions
 // ------------------------------------------------------------------------------------------------
 
-/// Fetch the current local-specific currency formatting
-/// rules.
 pub fn get_currency_format() -> CurrencyFormat {
     unsafe {
         let char_max = c_char::max_value();
         let lconv = localeconv();
-        CurrencyFormat {
+        CurrencyFormat{
             number_format: NumericFormat {
                 positive_sign: cstr_to_string((*lconv).positive_sign),
                 negative_sign: cstr_to_string((*lconv).negative_sign),
@@ -134,10 +57,10 @@ pub fn get_currency_format() -> CurrencyFormat {
             local_format: if (*lconv).frac_digits == char_max {
                 None
             } else {
-                Some(CurrencyCellFormat {
+                Some(CurrencyCellFormat{
                     currency_symbol: cstr_to_string((*lconv).currency_symbol),
                     decimal_precision: (*lconv).frac_digits as usize,
-                    positive_sign_format: SignFormat {
+                    positive_sign_format: SignFormat{
                         currency_symbol_precedes: ((*lconv).p_cs_precedes == 1),
                         space_separated: ((*lconv).p_sep_by_space == 1),
                         sign_location: match (*lconv).p_sign_posn {
@@ -147,9 +70,9 @@ pub fn get_currency_format() -> CurrencyFormat {
                             3 => SignLocation::BeforeCurrencySymbol,
                             4 => SignLocation::AfterCurrencySymbol,
                             _ => panic!("Bad sign location {}", (*lconv).p_sign_posn),
-                        },
+                        }
                     },
-                    negative_sign_format: SignFormat {
+                    negative_sign_format: SignFormat{
                         currency_symbol_precedes: ((*lconv).n_cs_precedes == 1),
                         space_separated: ((*lconv).n_sep_by_space == 1),
                         sign_location: match (*lconv).n_sign_posn {
@@ -159,11 +82,11 @@ pub fn get_currency_format() -> CurrencyFormat {
                             3 => SignLocation::BeforeCurrencySymbol,
                             4 => SignLocation::AfterCurrencySymbol,
                             _ => panic!("Bad sign location {}", (*lconv).n_sign_posn),
-                        },
-                    },
+                        }
+                    }
                 })
             },
-            international_format: if (*lconv).int_frac_digits == char_max {
+            international_format: if (*lconv).int_frac_digits  == char_max {
                 None
             } else {
                 Some(CurrencyCellFormat {
@@ -179,7 +102,7 @@ pub fn get_currency_format() -> CurrencyFormat {
                             3 => SignLocation::BeforeCurrencySymbol,
                             4 => SignLocation::AfterCurrencySymbol,
                             _ => panic!("Bad sign location {}", (*lconv).int_p_sign_posn),
-                        },
+                        }
                     },
                     negative_sign_format: SignFormat {
                         currency_symbol_precedes: ((*lconv).int_n_cs_precedes == 1),
@@ -191,10 +114,10 @@ pub fn get_currency_format() -> CurrencyFormat {
                             3 => SignLocation::BeforeCurrencySymbol,
                             4 => SignLocation::AfterCurrencySymbol,
                             _ => panic!("Bad sign location {}", (*lconv).int_n_sign_posn),
-                        },
-                    },
+                        }
+                    }
                 })
-            },
+            }
         }
     }
 }
@@ -205,14 +128,14 @@ pub fn get_currency_format() -> CurrencyFormat {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::settings::locale::api::*;
-    use crate::settings::locale::Category;
-    use crate::{Locale, LocaleString};
     use std::str::FromStr;
+    use crate::{Locale, LocaleString};
+    use crate::settings::locale::Category;
+    use crate::settings::locale::api::*;
+    use super::*;
 
     // --------------------------------------------------------------------------------------------
-    #[test]
+    # [test]
     fn test_currency_settings() {
         if get_locale(Category::Currency).unwrap() == Locale::POSIX {
             let format = get_currency_format();
@@ -226,7 +149,7 @@ mod tests {
     }
 
     // --------------------------------------------------------------------------------------------
-    #[test]
+    # [test]
     fn test_currency_settings_us() {
         let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
 

@@ -1,38 +1,16 @@
-/*!
-Provides ability to get/set the current process locale.
-
-This module allows the client to `get_locale` as well as to
-`set_locale`, and `set_locale_all`. There are two implementations
-that are related by the operating system, however some processes
-tend to only rely on one or the other. The first implementation,
-`api`, strictly uses the POSIX C API only whereas the second one,
-`env`, strictly uses the set of `LC_*` (and `LANG`) environment
-variables only.
-*/
-
 use crate::ffi::locale::*;
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
 // ------------------------------------------------------------------------------------------------
 
-/// The different categories for which locale information may be
-/// set. This implies that entirely different locales may be then
-///specified for each category.
 #[derive(Debug)]
 pub enum Category {
-    /// Affects the manner in which characters are classified by
-    /// functions such as `isdigit` and so forth.
     CharacterTypes,
-    /// Affects the manner in which currency data is formatted.
     Currency,
-    /// Affects the display of messages.
     Message,
-    /// Affects the manner in which numeric data is formatted.
     Numeric,
-    /// Affects the manner in which strings are collated/sorted.
     StringCollation,
-    /// Affects the manner in which date/time data is formatted.
     Time,
 }
 
@@ -72,18 +50,16 @@ impl Category {
 // Public Modules
 // ------------------------------------------------------------------------------------------------
 
-/// Get and set the current locale using the POSIX C API.
 pub mod api {
-    use super::*;
-    use crate::ffi::locale::setlocale;
-    use crate::locale::Locale;
-    use crate::{LocaleError, LocaleResult};
     use std::ffi::CStr;
     use std::os::raw;
     use std::ptr;
     use std::str::FromStr;
+    use crate::ffi::locale::setlocale;
+    use crate::locale::Locale;
+    use crate::{LocaleError, LocaleResult};
+    use super::*;
 
-    /// Set all locale categories to `new_locale`.
     pub fn set_locale_all(new_locale: &Locale) -> bool {
         let category: i32 = Category::all_code() as i32;
         unsafe {
@@ -93,7 +69,6 @@ pub mod api {
         }
     }
 
-    /// Set the  locale to `new_locale` for the `for_category` category only.
     pub fn set_locale(new_locale: &Locale, for_category: Category) -> bool {
         let category = for_category.to_os_code() as i32;
         unsafe {
@@ -103,7 +78,6 @@ pub mod api {
         }
     }
 
-    /// Get the  locale for the `for_category` category only.
     pub fn get_locale(for_category: Category) -> LocaleResult<Locale> {
         let category = for_category.to_os_code() as i32;
         unsafe {
@@ -118,29 +92,25 @@ pub mod api {
     }
 }
 
-/// Get and set the current locale using LC_* environment variables.
 pub mod env {
-    use super::*;
+    use std::env::{var, set_var};
+    use std::str::FromStr;
     use crate::locale::Locale;
     use crate::{LocaleError, LocaleResult};
-    use std::env::{set_var, var};
-    use std::str::FromStr;
+    use super::*;
 
-    /// Set all locale categories to `new_locale`.
     pub fn set_locale_all(new_locale: &Locale) -> bool {
         let category = Category::all_name();
         set_var(category, new_locale.to_string());
         true
     }
 
-    /// Set the  locale to `new_locale` for the `for_category` category only.
     pub fn set_locale(new_locale: &Locale, for_category: Category) -> bool {
         let category = for_category.to_os_name();
         set_var(category, new_locale.to_string());
         true
     }
 
-    /// Get the  locale for the `for_category` category only.
     pub fn get_locale(for_category: Category) -> LocaleResult<Locale> {
         let category = for_category.to_os_name();
         let mut locale_str = get_from_env(category);
@@ -178,9 +148,9 @@ pub mod env {
 
 #[cfg(test)]
 mod tests {
-    use super::{api, env, Category};
-    use crate::{Locale, LocaleString};
     use std::str::FromStr;
+    use crate::{Locale, LocaleString};
+    use super::{Category, api, env};
 
     // --------------------------------------------------------------------------------------------
     #[test]

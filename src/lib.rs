@@ -21,7 +21,7 @@ This crate uses bindgen for the creation of operating system bindings to the
 `langinfo`, `localcharset`, `locale`, and `xlocale` headers. Another
 crate () does something similar, however...
 
-## Example - Codes
+## Example
 
 The following example demonstrates some of the components of the crate, at
 least some reasonable use cases.
@@ -57,37 +57,6 @@ let currencies = currency::currencies_for_country_name(mexico_region.name.as_str
 println!("{:?}", currencies);
 ```
 
-## Example - Settings
-
-In the following example we have a naïve implementation of a currency formatter.
-To format a US dollar amount correctly we first set the current locale for the
-`Currency` `Category` and then call the `get_currency_format`. From this we use
-only the simplest of the formatting options to display our currency amount.
-
-```
-use std::str::FromStr;
-use simple_locale::{Locale, LocaleString};
-use simple_locale::settings::locale::Category;
-use simple_locale::settings::locale::api::*;
-use simple_locale::settings::currency::get_currency_format;
-
-let amount: f64 = 5.909;
-let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
-
-if set_locale(&Locale::String(en_us), Category::Currency) {
-    let format = get_currency_format();
-    let local = format.local_format.unwrap();
-    println!(
-        "{2}{0}{3}{1:.4$}",
-        amount.trunc(),
-        amount.fract(),
-        local.currency_symbol,
-        format.number_format.decimal_separator,
-        local.decimal_precision
-    );
-}
-
-```
 ## FFI Bindings
 
 As mentioned above, this crate depends on FFI bindings to POSIX locale

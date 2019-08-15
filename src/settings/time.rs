@@ -1,5 +1,9 @@
-use crate::ffi::utils::*;
+/*!
+Fetch locale-specific date and time formatting settings.
+*/
+
 use crate::ffi::langinfo;
+use crate::ffi::utils::*;
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
@@ -43,7 +47,7 @@ pub struct DateTimeFormat {
 // ------------------------------------------------------------------------------------------------
 
 pub fn get_calendar_names() -> CalendarNames {
-    CalendarNames{
+    CalendarNames {
         week_day_names: make_name_vector(7, langinfo::DAY_1, langinfo::ABDAY_1),
         month_names: make_name_vector(12, langinfo::MON_1, langinfo::ABMON_1),
         am_string: get_nl_string(langinfo::AM_STR),
@@ -52,16 +56,16 @@ pub fn get_calendar_names() -> CalendarNames {
 }
 
 fn make_name_vector(count: u32, n_st: u32, ab_st: u32) -> Vec<Name> {
-    (0..count).map(|offset|
-        Name{
+    (0..count)
+        .map(|offset| Name {
             name: get_nl_string(n_st + offset),
             abbreviated: get_nl_string(ab_st + offset),
-        }
-    ).collect()
+        })
+        .collect()
 }
 
 pub fn get_date_time_format() -> DateTimeFormat {
-    DateTimeFormat{
+    DateTimeFormat {
         date_time_format: get_nl_string(langinfo::D_T_FMT),
         date_format: get_nl_string(langinfo::D_FMT),
         time_format: get_nl_string(langinfo::T_FMT),
@@ -89,10 +93,10 @@ pub fn get_date_time_format() -> DateTimeFormat {
 
 #[cfg(test)]
 mod tests {
-    use super::{get_date_time_format, get_calendar_names};
+    use super::{get_calendar_names, get_date_time_format};
 
     // --------------------------------------------------------------------------------------------
-    # [test]
+    #[test]
     fn test_something() {
         println!("{:#?}", get_calendar_names());
         println!("{:#?}", get_date_time_format());

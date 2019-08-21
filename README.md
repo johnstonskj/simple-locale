@@ -80,3 +80,10 @@ Currently data is generated for the following standards:
 * ISO 15924 _Codes for the representation of names of scripts_; alphabetic 
   and numeric codes supported.
 
+## TODO
+
+* Determine naming convention between the names in the `codes` and `settings`
+  modules. Expect that the names in code modules will be changed to reflect
+  those in the settings.
+* Build and test for Linux.
+* Build and test for Windows.

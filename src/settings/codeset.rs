@@ -74,7 +74,7 @@ pub fn get_code_set_format_for_locale(
 
 #[cfg(test)]
 mod tests {
-    use crate::settings::ctype::{get_code_set_format, get_code_set_format_for_locale};
+    use crate::settings::codeset::{get_code_set_format, get_code_set_format_for_locale};
     use crate::settings::locale::api::set_locale;
     use crate::settings::locale::Category;
     use crate::Locale;
@@ -101,6 +101,20 @@ mod tests {
             println!("{:#?}", format);
             let format = format.unwrap();
             assert_eq!(format.code_set, None);
+            assert_eq!(format.multibyte_max_bytes, Some(4));
+        } else {
+            panic!("set_locale returned false");
+        }
+    }
+
+    #[test]
+    fn test_get_code_set_format_for_locale_2() {
+        if set_locale(&Locale::POSIX, Category::CharacterTypes) {
+            let format =
+                get_code_set_format_for_locale(Locale::from_str("fr_FR.UTF-8").unwrap(), false);
+            println!("{:#?}", format);
+            let format = format.unwrap();
+            assert_eq!(format.code_set, Some("UTF-8".to_string()));
             assert_eq!(format.multibyte_max_bytes, Some(4));
         } else {
             panic!("set_locale returned false");

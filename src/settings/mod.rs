@@ -7,14 +7,14 @@ modules. The categories are show in the table below.
 | POSIX Category | Module     | Function(s)                                  |
 |----------------|------------|----------------------------------------------|
 | `LC_COLLATE`   | N/A        | |
-| `LC_CTYPE`     | N/A        | |
+| `LC_CTYPE`     | [`codeset`](codeset/index.html) | `get_code_set_format`, `get_code_set_format_for_locale` |
 | `LC_MESSAGES`  | [`messages`](messages/index.html) | `get_message_format`, `get_message_format_for_locale` |
 | `LC_MONETARY`  | [`currency`](currency/index.html) | `get_currency_format`, `get_currency_format_for_locale` |
-| `LC_NUMERIC`   | [`numeric`](numeric/index.html)  | `get_numeric_format`, `get_numeric_format_for_locale` |
-| `LC_TIME`      | [`time`](time/index.html)     | `get_date_time_format`, `get_date_time_format_for_locale`, `get_calendar_names`, `get_calendar_names_for_locale` |
+| `LC_NUMERIC`   | [`numeric`](numeric/index.html) | `get_numeric_format`, `get_numeric_format_for_locale` |
+| `LC_TIME`      | [`time`](time/index.html) | `get_date_time_format`, `get_date_time_format_for_locale`, `get_calendar_names`, `get_calendar_names_for_locale` |
 
-> Note: the POSIX categories `LC_COLLATE`, and `LC_CTYPE` are not mapped to
-> modules as there are no calls to retrieve specific information regarding these.
+> Note: the POSIX category `LC_COLLATE` is not mapped to
+> modules as there are no calls to retrieve specific information.
 
 For each module there is _at least_ a matching pair of functions, one which takes
 zero parameters and returns the current locale settings, and one which takes
@@ -52,7 +52,7 @@ for a locale other than the current.
 
 pub mod locale;
 
-pub mod ctype;
+pub mod codeset;
 
 pub mod currency;
 

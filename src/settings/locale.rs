@@ -82,7 +82,6 @@ pub mod api {
     use std::os::raw;
     use std::ptr;
     use std::str::FromStr;
-    use crate::ffi::localcharset::locale_charset;
 
     /// Set all locale categories to `new_locale`.
     pub fn set_locale_all(new_locale: &Locale) -> bool {

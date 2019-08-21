@@ -4,6 +4,22 @@ Fetch locale-specific number formatting settings.
 This module provides basic formatting rules for most rational
 numbers; floating point numbers in scientific notation, fractional
 numbers, and imaginary numbers are not covered.
+
+## Example
+
+```
+use simple_locale::settings::locale::api::get_locale;
+use simple_locale::settings::locale::Category;
+use simple_locale::settings::numeric::get_numeric_format;
+use simple_locale::Locale;
+
+if get_locale(Category::Currency).unwrap() == Locale::POSIX {
+    let format = get_numeric_format();
+    assert_eq!(format.decimal_separator, ".");
+} else {
+    panic!("expecting POSIX locale");
+}
+```
 */
 
 use crate::ffi::locale::localeconv;
@@ -105,7 +121,7 @@ mod tests {
             println!("{:#?}", format);
             assert_eq!(format.decimal_separator, ".");
         } else {
-            warn!("didn't run test, too lazy to reset locale");
+            panic!("expecting POSIX locale");
         }
     }
 }

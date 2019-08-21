@@ -3,6 +3,25 @@ Fetch locale-specific message formatting settings.
 
 This module is relatively simple as only a small number of
 settings are defined by POSIX for the messages category.
+
+## Example
+
+```
+use simple_locale::settings::locale::api::get_locale;
+use simple_locale::settings::locale::Category;
+use simple_locale::settings::messages::get_message_format;
+use simple_locale::Locale;
+use std::str::FromStr;
+
+let locale = get_locale(Category::Time).unwrap();
+if locale == Locale::POSIX {
+    let format = get_message_format();
+    assert_eq!(format.yes_expression, Some("^[yY]".to_string()));
+    assert_eq!(format.no_string, Some("no".to_string()));
+} else {
+    panic!("expecting POSIX locale");
+}
+```
 */
 
 use crate::ffi::langinfo;

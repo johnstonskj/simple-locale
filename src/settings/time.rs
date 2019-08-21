@@ -3,8 +3,14 @@ Fetch locale-specific date and time formatting settings.
 
 This module provides the details for both time and date formatting
 as well as a set of calendar names used for day and month display.
+
+## Date and Time Formatting
+
 The date and time formatting strings use the field specifiers from
-the C `strftime` function.
+the C [`strftime`](https://man.openbsd.org/strftime.3) function. These
+strings may also be used with the chrono crate's
+[`format::strftime`](https://docs.rs/chrono/0.4.7/chrono/format/strftime/index.html)
+module.
 */
 
 use crate::ffi::langinfo;

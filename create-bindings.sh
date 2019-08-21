@@ -11,15 +11,16 @@
 case $(uname) in
   Darwin)
     if [[ $(command -v llvm-config) ]] ; then
-      INCLUDE="$(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
+      MAC_PLATFORM=MacOSX
+      INCLUDE="$(xcode-select -p)/Platforms/$MAC_PLATFORM.platform/Developer/SDKs/$MAC_PLATFORM.sdk/usr/include"
       BIND_HEADERS=langinfo,localcharset,locale,xlocale
       MODULE=macos
-      else
+    else
         echo "llvm not installed, or not on the path, try:"
         echo "$ brew install llvm"
         echo "$ PATH=\$PATH:/usr/local/opt/llvm/bin"
         exit 2
-      fi
+    fi
     ;;
   Linux)
     INCLUDE="/usr/include"

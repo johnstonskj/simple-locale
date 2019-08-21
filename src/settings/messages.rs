@@ -26,6 +26,7 @@ if locale == Locale::POSIX {
 
 use crate::ffi::langinfo;
 use crate::ffi::utils::*;
+use crate::ffi::xlocale::___mb_cur_max;
 use crate::{Locale, LocaleResult};
 
 // ------------------------------------------------------------------------------------------------
@@ -39,6 +40,9 @@ pub struct MessageFormat {
     /// Note that this does not return standard code set identifiers and so
     /// this value cannot be used with the `codes::codesets` module.
     pub code_set: Option<String>,
+    /// The maximum number of bytes needed to represent a single wide
+    /// character in the current locale.
+    pub multibyte_max_bytes: Option<u32>,
     /// An expression to validate 'yes' values.
     pub yes_expression: Option<String>,
     /// A default string for 'yes'.
@@ -55,8 +59,10 @@ pub struct MessageFormat {
 
 /// Fetch the message formatting settings for the current locale.
 pub fn get_message_format() -> MessageFormat {
+    let mb_max_bytes = unsafe { ___mb_cur_max() as u32 };
     MessageFormat {
         code_set: get_nl_string(langinfo::CODESET),
+        multibyte_max_bytes: Some(mb_max_bytes),
         yes_expression: get_nl_string(langinfo::YESEXPR),
         yes_string: get_nl_string(langinfo::YESSTR),
         no_expression: get_nl_string(langinfo::NOEXPR),
@@ -92,7 +98,7 @@ pub fn get_message_format_for_locale(
 
 #[cfg(test)]
 mod tests {
-    use crate::settings::locale::api::get_locale;
+    use crate::settings::locale::api::set_locale;
     use crate::settings::locale::Category;
     use crate::settings::messages::{get_message_format, get_message_format_for_locale};
     use crate::Locale;
@@ -101,29 +107,29 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_get_message_format() {
-        let locale = get_locale(Category::Time).unwrap();
-        if locale == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let format = get_message_format();
             println!("{:#?}", format);
+            assert_eq!(format.multibyte_max_bytes, Some(1));
             assert_eq!(format.yes_expression, Some("^[yY]".to_string()));
             assert_eq!(format.no_string, Some("no".to_string()));
         } else {
-            panic!("expecting POSIX locale");
+            panic!("set_locale returned false");
         }
     }
 
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_get_message_format_for_locale() {
-        let locale = get_locale(Category::Time).unwrap();
-        if locale == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let format = get_message_format_for_locale(Locale::from_str("fr_FR").unwrap(), false);
             println!("{:#?}", format);
             let format = format.unwrap();
+            assert_eq!(format.multibyte_max_bytes, Some(4));
             assert_eq!(format.yes_expression, Some("^[oOyY].*".to_string()));
             assert_eq!(format.no_string, Some("no".to_string()));
         } else {
-            panic!("expecting POSIX locale");
+            panic!("set_locale returned false");
         }
     }
 }

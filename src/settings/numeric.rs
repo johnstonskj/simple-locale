@@ -116,12 +116,12 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_numeric_settings() {
-        if get_locale(Category::Currency).unwrap() == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let format = get_numeric_format();
             println!("{:#?}", format);
             assert_eq!(format.decimal_separator, ".");
         } else {
-            panic!("expecting POSIX locale");
+            panic!("set_locale returned false");
         }
     }
 }

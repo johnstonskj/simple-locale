@@ -236,14 +236,14 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_currency_settings() {
-        if get_locale(Category::Currency).unwrap() == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let format = get_currency_format();
             println!("{:#?}", format);
             assert_eq!(format.number_format.decimal_separator, "");
             assert_eq!(format.local_format, None);
             assert_eq!(format.international_format, None);
         } else {
-            warn!("didn't run test, too lazy to reset locale");
+            panic!("set_locale returned false");
         }
     }
 
@@ -251,13 +251,14 @@ mod tests {
     #[test]
     fn test_currency_settings_us() {
         let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
-
         if set_locale(&Locale::String(en_us), Category::Currency) {
             let format = get_currency_format();
             println!("{:#?}", format);
             assert_eq!(format.number_format.decimal_separator, ".");
             assert_eq!(format.local_format.unwrap().currency_symbol, "$");
             assert_eq!(format.international_format.unwrap().currency_symbol, "USD ");
+        } else {
+            panic!("set_locale returned false");
         }
     }
 }

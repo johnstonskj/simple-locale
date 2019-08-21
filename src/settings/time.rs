@@ -64,10 +64,16 @@ pub struct DateTimeFormat {
     time_format: Option<String>,
     /// The string to use to format a time, with am/pm.
     time_ampm_format: Option<String>,
+    /// Alternate era name
     era: Option<String>,
+    /// The string to use to format a complete date and time in the alternate era.
     era_date_time_format: Option<String>,
+    /// The string to use to format a date in the alternate era.
     era_date_format: Option<String>,
+    /// The string to use to format a time in the alternate era.
     era_time_format: Option<String>,
+    /// The alternate symbols for digits.
+    alternate_digit_symbol: Option<String>,
     /// The locale's preference on date and month ordering.
     month_day_order: Option<MonthDayOrder>,
 }
@@ -119,6 +125,7 @@ pub fn get_date_time_format() -> DateTimeFormat {
         era_date_time_format: get_nl_string(langinfo::ERA_D_T_FMT),
         era_date_format: get_nl_string(langinfo::ERA_D_FMT),
         era_time_format: get_nl_string(langinfo::ERA_T_FMT),
+        alternate_digit_symbol: get_nl_string(langinfo::ALT_DIGITS),
         month_day_order: match get_nl_string(langinfo::D_MD_ORDER) {
             Some(s) => {
                 if s == "md".to_string() {
@@ -176,7 +183,7 @@ fn make_name_vector(count: u32, n_st: u32, ab_st: u32) -> Vec<Name> {
 #[cfg(test)]
 mod tests {
     use super::{get_calendar_names, get_date_time_format};
-    use crate::settings::locale::api::get_locale;
+    use crate::settings::locale::api::set_locale;
     use crate::settings::locale::Category;
     use crate::settings::time::{MonthDayOrder, Name};
     use crate::Locale;
@@ -184,8 +191,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_week_day_names() {
-        let locale = get_locale(Category::Time).unwrap();
-        if locale == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let names = get_calendar_names();
             assert_eq!(names.week_day_names.len(), 7);
             let sunday = names.week_day_names.get(0).unwrap();
@@ -197,14 +203,13 @@ mod tests {
                 }
             );
         } else {
-            panic!("expecting POSIX locale");
+            panic!("set_locale returned false");
         }
     }
 
     #[test]
     fn test_month_names() {
-        let locale = get_locale(Category::Time).unwrap();
-        if locale == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let names = get_calendar_names();
             assert_eq!(names.month_names.len(), 12);
             let january = names.month_names.get(0).unwrap();
@@ -216,34 +221,32 @@ mod tests {
                 }
             );
         } else {
-            panic!("expecting POSIX locale");
+            panic!("set_locale returned false");
         }
     }
 
     #[test]
     fn test_ampm_names() {
-        let locale = get_locale(Category::Time).unwrap();
-        if locale == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let names = get_calendar_names();
             assert_eq!(names.am_string, Some("AM".to_string()));
             assert_eq!(names.pm_string, Some("PM".to_string()));
         } else {
-            panic!("expecting POSIX locale");
+            panic!("set_locale returned false");
         }
     }
 
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_date_time_formats() {
-        let locale = get_locale(Category::Time).unwrap();
-        if locale == Locale::POSIX {
+        if set_locale(&Locale::POSIX, Category::Currency) {
             let formats = get_date_time_format();
             println!("{:#?}", formats);
             assert_eq!(formats.date_format, Some("%m/%d/%y".to_string()));
             assert_eq!(formats.era, None);
             assert_eq!(formats.month_day_order, Some(MonthDayOrder::MonthDay));
         } else {
-            panic!("expecting POSIX locale");
+            panic!("set_locale returned false");
         }
     }
 }

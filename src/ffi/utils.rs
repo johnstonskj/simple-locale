@@ -48,7 +48,7 @@ pub fn get_nl_string(item: u32) -> Option<String> {
 
 pub fn get_format_for_locale<T>(
     locale: Locale,
-    get_format: &Fn() -> T,
+    get_format: &dyn Fn() -> T,
     inherit_current: bool,
 ) -> LocaleResult<T> {
     let os_loc = unsafe {

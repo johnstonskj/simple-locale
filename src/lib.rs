@@ -1,5 +1,5 @@
 /*!
-An higher-level interface to all manner of locale-related information.
+An interface to all manner of locale-related information.
 
 This crate provides a higher-level interface to a number of locale-related
 sources, in three areas:

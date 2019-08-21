@@ -83,6 +83,7 @@ Currently data is generated for the following standards:
 
 ## TODO
 
+* Should _strict_ be the default for `LocaleString`?
 * Determine naming convention between the names in the `codes` and `settings`
   modules. 
   * Expect that the names in code modules will be changed to reflect

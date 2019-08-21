@@ -74,9 +74,9 @@ pub fn get_code_set_format_for_locale(
 
 #[cfg(test)]
 mod tests {
+    use crate::settings::ctype::{get_code_set_format, get_code_set_format_for_locale};
     use crate::settings::locale::api::set_locale;
     use crate::settings::locale::Category;
-    use crate::settings::ctype::{get_code_set_format, get_code_set_format_for_locale};
     use crate::Locale;
     use std::str::FromStr;
 

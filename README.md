@@ -16,7 +16,7 @@ sources, in three areas:
    concerning them. For example, ISO-396 language identifiers, or ISO-3166
    country identifiers. These are under the module `simple_locale::codes`.
 1. Locale settings, usually accessed via POSIX (see
-   [ISO/IEC 15897](https://www.iso.org/standard/50707.html) operating system
+   [ISO/IEC 15897](https://www.iso.org/standard/50707.html)) operating system
    functions. These are under the module `simple_locale::settings`.
 1. A `Locale` enumeration, and a `LocaleString` structure are provided
    that may be used to parse and construct locale identifiers in

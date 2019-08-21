@@ -45,6 +45,7 @@ if set_locale(&Locale::String(en_us), Category::Currency) {
 
 use crate::ffi::locale::localeconv;
 use crate::ffi::utils::*;
+use crate::settings::locale::Category;
 use crate::settings::numeric::NumericFormat;
 use crate::{Locale, LocaleResult};
 use std::os::raw::c_char;
@@ -218,7 +219,12 @@ pub fn get_currency_format_for_locale(
     locale: Locale,
     inherit_current: bool,
 ) -> LocaleResult<CurrencyFormat> {
-    get_format_for_locale(locale, &get_currency_format, inherit_current)
+    get_format_for_locale(
+        Category::Currency,
+        locale,
+        &get_currency_format,
+        inherit_current,
+    )
 }
 
 // ------------------------------------------------------------------------------------------------

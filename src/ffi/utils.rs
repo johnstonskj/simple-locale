@@ -47,6 +47,7 @@ pub fn get_nl_string(item: u32) -> Option<String> {
 }
 
 pub fn get_format_for_locale<T>(
+    category: Category,
     locale: Locale,
     get_format: &dyn Fn() -> T,
     inherit_current: bool,
@@ -58,7 +59,7 @@ pub fn get_format_for_locale<T>(
             false => null_loc,
         };
         let os_loc = newlocale(
-            Category::Message.to_os_code() as i32,
+            category.to_os_code() as i32,
             locale.to_string().as_ptr() as *const i8,
             curr_loc,
         );

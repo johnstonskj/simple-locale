@@ -15,6 +15,7 @@ module.
 
 use crate::ffi::langinfo;
 use crate::ffi::utils::*;
+use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
 
 // ------------------------------------------------------------------------------------------------
@@ -111,7 +112,7 @@ pub fn get_calendar_names_for_locale(
     locale: Locale,
     inherit_current: bool,
 ) -> LocaleResult<CalendarNames> {
-    get_format_for_locale(locale, &get_calendar_names, inherit_current)
+    get_format_for_locale(Category::Time, locale, &get_calendar_names, inherit_current)
 }
 
 /// Fetch the date and time formatting settings for the current locale.
@@ -160,7 +161,12 @@ pub fn get_date_time_format_for_locale(
     locale: Locale,
     inherit_current: bool,
 ) -> LocaleResult<DateTimeFormat> {
-    get_format_for_locale(locale, &get_date_time_format, inherit_current)
+    get_format_for_locale(
+        Category::Time,
+        locale,
+        &get_date_time_format,
+        inherit_current,
+    )
 }
 
 // ------------------------------------------------------------------------------------------------

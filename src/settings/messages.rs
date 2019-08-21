@@ -27,6 +27,7 @@ if locale == Locale::POSIX {
 use crate::ffi::langinfo;
 use crate::ffi::utils::*;
 use crate::ffi::xlocale::___mb_cur_max;
+use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
 
 // ------------------------------------------------------------------------------------------------
@@ -89,7 +90,12 @@ pub fn get_message_format_for_locale(
     locale: Locale,
     inherit_current: bool,
 ) -> LocaleResult<MessageFormat> {
-    get_format_for_locale(locale, &get_message_format, inherit_current)
+    get_format_for_locale(
+        Category::Message,
+        locale,
+        &get_message_format,
+        inherit_current,
+    )
 }
 
 // ------------------------------------------------------------------------------------------------

@@ -24,6 +24,7 @@ if get_locale(Category::Currency).unwrap() == Locale::POSIX {
 
 use crate::ffi::locale::localeconv;
 use crate::ffi::utils::*;
+use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
 
 // ------------------------------------------------------------------------------------------------
@@ -82,7 +83,12 @@ pub fn get_numeric_format_for_locale(
     locale: Locale,
     inherit_current: bool,
 ) -> LocaleResult<NumericFormat> {
-    get_format_for_locale(locale, &get_numeric_format, inherit_current)
+    get_format_for_locale(
+        Category::Numeric,
+        locale,
+        &get_numeric_format,
+        inherit_current,
+    )
 }
 
 #[cfg(experimental)]

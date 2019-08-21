@@ -11,6 +11,10 @@ variables only.
 */
 
 use crate::ffi::locale::*;
+//use crate::ffi::xlocale::{
+//    LC_COLLATE_MASK, LC_CTYPE_MASK, LC_MESSAGES_MASK, LC_MONETARY_MASK, LC_NUMERIC_MASK,
+//    LC_TIME_MASK,
+//};
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
@@ -55,6 +59,17 @@ impl Category {
             Category::Message => LC_MESSAGES,
         }
     }
+
+    //    pub(crate) fn to_os_mask(&self) -> u32 {
+    //        match self {
+    //            Category::StringCollation => LC_COLLATE_MASK,
+    //            Category::CharacterTypes => LC_CTYPE_MASK,
+    //            Category::Currency => LC_MONETARY_MASK,
+    //            Category::Numeric => LC_NUMERIC_MASK,
+    //            Category::Time => LC_TIME_MASK,
+    //            Category::Message => LC_MESSAGES_MASK,
+    //        }
+    //    }
 
     pub(crate) fn to_os_name(&self) -> &str {
         match self {

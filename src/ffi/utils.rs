@@ -1,3 +1,6 @@
+/*!
+Wrappers and utilities around the raw FFI bindings.
+*/
 use std::ffi::CStr;
 use std::os::raw::c_char;
 use std::ptr;
@@ -46,6 +49,8 @@ pub fn get_nl_string(item: u32) -> Option<String> {
     }
 }
 
+/// Used to wrap functions in settings::* modules that need to
+/// retrieve settings for a locale other than the current.
 pub fn get_format_for_locale<T>(
     category: Category,
     locale: Locale,
@@ -59,17 +64,16 @@ pub fn get_format_for_locale<T>(
             false => null_loc,
         };
         debug!(
-            "newlocale, code: {}, mask: {}",
-            category.to_os_code(),
-            category.to_os_mask()
+            "newlocale({:?}, {:#?}, {} [{:?}])",
+            category, locale, inherit_current, curr_loc
         );
-        debug!("newlocale {:#?}, {:?}", locale, curr_loc);
         let os_loc = newlocale(
             category.to_os_mask() as i32,
             locale.to_string().as_ptr() as *const i8,
             curr_loc,
         );
         if os_loc == null_loc {
+            warn!("newlocale returned null");
             return Err(LocaleError::OSError);
         }
         uselocale(os_loc)

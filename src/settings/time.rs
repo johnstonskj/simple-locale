@@ -9,6 +9,7 @@ the C `strftime` function.
 
 use crate::ffi::langinfo;
 use crate::ffi::utils::*;
+use crate::{Locale, LocaleResult};
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
@@ -79,6 +80,28 @@ pub fn get_calendar_names() -> CalendarNames {
     }
 }
 
+/// Fetch the calendar names for a specified `Locale`.
+///
+/// # Arguments
+///
+/// * `locale` - The locale to query.
+/// * `inherit_current` - Whether the specified locale should inherit
+///   from the current locale.
+///
+/// If `inherit_current` is `false` the `locale` specified will be treated
+/// as an entirely new and complete locale when calling the C
+/// [`newlocale`](https://man.openbsd.org/newlocale.3) function. If it is
+/// `true` the `locale` is assumed to be a partially specified one and inherits
+/// any unspecified components from the current locale. For example, if the
+/// current locale is `en_US.UTF-8` and the parameters passed are `_NZ` and
+/// `true` then the resulting locale will be `en_NZ.UTF-8`.
+pub fn get_calendar_names_for_locale(
+    locale: Locale,
+    inherit_current: bool,
+) -> LocaleResult<CalendarNames> {
+    get_format_for_locale(locale, &get_calendar_names, inherit_current)
+}
+
 /// Fetch the date and time formatting settings for the current locale.
 pub fn get_date_time_format() -> DateTimeFormat {
     DateTimeFormat {
@@ -103,6 +126,28 @@ pub fn get_date_time_format() -> DateTimeFormat {
             _ => None,
         },
     }
+}
+
+/// Fetch the date and time formatting rules for a specified `Locale`.
+///
+/// # Arguments
+///
+/// * `locale` - The locale to query.
+/// * `inherit_current` - Whether the specified locale should inherit
+///   from the current locale.
+///
+/// If `inherit_current` is `false` the `locale` specified will be treated
+/// as an entirely new and complete locale when calling the C
+/// [`newlocale`](https://man.openbsd.org/newlocale.3) function. If it is
+/// `true` the `locale` is assumed to be a partially specified one and inherits
+/// any unspecified components from the current locale. For example, if the
+/// current locale is `en_US.UTF-8` and the parameters passed are `_NZ` and
+/// `true` then the resulting locale will be `en_NZ.UTF-8`.
+pub fn get_date_time_format_for_locale(
+    locale: Locale,
+    inherit_current: bool,
+) -> LocaleResult<DateTimeFormat> {
+    get_format_for_locale(locale, &get_date_time_format, inherit_current)
 }
 
 // ------------------------------------------------------------------------------------------------

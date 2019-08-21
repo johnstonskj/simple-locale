@@ -46,6 +46,7 @@ if set_locale(&Locale::String(en_us), Category::Currency) {
 use crate::ffi::locale::localeconv;
 use crate::ffi::utils::*;
 use crate::settings::numeric::NumericFormat;
+use crate::{Locale, LocaleResult};
 use std::os::raw::c_char;
 
 // ------------------------------------------------------------------------------------------------
@@ -117,8 +118,7 @@ pub struct CurrencyFormat {
 // Public Functions
 // ------------------------------------------------------------------------------------------------
 
-/// Fetch the current local-specific currency formatting
-/// rules.
+/// Fetch the current local-specific currency formatting rules.
 pub fn get_currency_format() -> CurrencyFormat {
     unsafe {
         let char_max = c_char::max_value();
@@ -197,6 +197,28 @@ pub fn get_currency_format() -> CurrencyFormat {
             },
         }
     }
+}
+
+/// Fetch the currency formatting rules for a specified `Locale`.
+///
+/// # Arguments
+///
+/// * `locale` - The locale to query.
+/// * `inherit_current` - Whether the specified locale should inherit
+///   from the current locale.
+///
+/// If `inherit_current` is `false` the `locale` specified will be treated
+/// as an entirely new and complete locale when calling the C
+/// [`newlocale`](https://man.openbsd.org/newlocale.3) function. If it is
+/// `true` the `locale` is assumed to be a partially specified one and inherits
+/// any unspecified components from the current locale. For example, if the
+/// current locale is `en_US.UTF-8` and the parameters passed are `_NZ` and
+/// `true` then the resulting locale will be `en_NZ.UTF-8`.
+pub fn get_currency_format_for_locale(
+    locale: Locale,
+    inherit_current: bool,
+) -> LocaleResult<CurrencyFormat> {
+    get_format_for_locale(locale, &get_currency_format, inherit_current)
 }
 
 // ------------------------------------------------------------------------------------------------

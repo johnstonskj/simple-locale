@@ -61,7 +61,8 @@ println!("{:?}", currencies);
 
 In the following example we have a naïve implementation of a currency formatter.
 To format a US dollar amount correctly we first set the current locale for the
-`Currency` `Category` and then call the `get_currency_format`. From this we use
+`Currency` [`Category`](settings/locale/enum.Category.html) and then call the
+[`get_currency_format`](settings/currency/fn.get_currency_format.html). From this we use
 only the simplest of the formatting options to display our currency amount.
 
 ```

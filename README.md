@@ -43,6 +43,10 @@ let currencies = currency::currencies_for_country_name(mexico_region.name.as_str
 println!("{:?}", currencies);
 ```
 
+## Operating System Coverage
+
+Currently only tested on macOS, Linux and Windows to come.
+
 ## Pre-Build Process
 
 The following describe two code generation steps that are executed outside

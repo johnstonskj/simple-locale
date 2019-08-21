@@ -1,7 +1,11 @@
 use std::ffi::CStr;
 use std::os::raw::c_char;
+use std::ptr;
 
 use super::langinfo::{nl_item, nl_langinfo};
+use crate::ffi::xlocale::{_xlocale, freelocale, newlocale, uselocale};
+use crate::settings::locale::Category;
+use crate::{Locale, LocaleError, LocaleResult};
 
 /// Convert a raw C string, `*mut c_char` into a Rust String
 /// type. This function should only be called from unsafe code.
@@ -40,6 +44,34 @@ pub fn get_nl_string(item: u32) -> Option<String> {
     } else {
         Some(r_str)
     }
+}
+
+pub fn get_format_for_locale<T>(
+    locale: Locale,
+    get_format: &Fn() -> T,
+    inherit_current: bool,
+) -> LocaleResult<T> {
+    let os_loc = unsafe {
+        let null_loc: *mut _xlocale = ptr::null_mut();
+        let curr_loc = match inherit_current {
+            true => uselocale(null_loc),
+            false => null_loc,
+        };
+        let os_loc = newlocale(
+            Category::Message.to_os_code() as i32,
+            locale.to_string().as_ptr() as *const i8,
+            curr_loc,
+        );
+        if os_loc == null_loc {
+            return Err(LocaleError::OSError);
+        }
+        uselocale(os_loc)
+    };
+    let format = get_format();
+    unsafe {
+        freelocale(os_loc);
+    }
+    Ok(format)
 }
 
 // ------------------------------------------------------------------------------------------------

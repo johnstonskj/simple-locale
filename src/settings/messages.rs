@@ -7,10 +7,7 @@ settings are defined by POSIX for the messages category.
 
 use crate::ffi::langinfo;
 use crate::ffi::utils::*;
-use crate::ffi::xlocale::{_xlocale, freelocale, newlocale, uselocale};
-use crate::settings::locale::Category;
-use crate::{Locale, LocaleError, LocaleResult, LocaleString};
-use std::ptr;
+use crate::{Locale, LocaleResult};
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
@@ -48,45 +45,11 @@ pub fn get_message_format() -> MessageFormat {
     }
 }
 
-pub fn get_message_format_for_locale(locale: Locale) -> LocaleResult<MessageFormat> {
-    let os_loc = unsafe {
-        let null_loc: *mut _xlocale = ptr::null_mut();
-        let os_loc = newlocale(
-            Category::Message.to_os_code() as i32,
-            locale.to_string().as_ptr() as *const i8,
-            null_loc,
-        );
-        if os_loc == null_loc {
-            return Err(LocaleError::OSError);
-        }
-        uselocale(os_loc)
-    };
-    let format = get_message_format();
-    unsafe {
-        freelocale(os_loc);
-    }
-    Ok(format)
-}
-
-pub fn get_message_format_for_partial_locale(locale: LocaleString) -> LocaleResult<MessageFormat> {
-    let os_loc = unsafe {
-        let null_loc: *mut _xlocale = ptr::null_mut();
-        let curr_loc = uselocale(null_loc);
-        let os_loc = newlocale(
-            Category::Message.to_os_code() as i32,
-            locale.to_string().as_ptr() as *const i8,
-            curr_loc,
-        );
-        if os_loc == null_loc {
-            return Err(LocaleError::OSError);
-        }
-        uselocale(os_loc)
-    };
-    let format = get_message_format();
-    unsafe {
-        freelocale(os_loc);
-    }
-    Ok(format)
+pub fn get_message_format_for_locale(
+    locale: Locale,
+    inherit_current: bool,
+) -> LocaleResult<MessageFormat> {
+    get_format_for_locale(locale, &get_message_format, inherit_current)
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -108,7 +71,7 @@ mod tests {
         if locale == Locale::POSIX {
             let format = get_message_format();
             println!("{:#?}", format);
-            assert_eq!(format.yes_string, Some("yes".to_string()));
+            assert_eq!(format.yes_expression, Some("^[yY]".to_string()));
             assert_eq!(format.no_string, Some("no".to_string()));
         } else {
             panic!("expecting POSIX locale");
@@ -120,10 +83,10 @@ mod tests {
     fn test_get_message_format_for_locale() {
         let locale = get_locale(Category::Time).unwrap();
         if locale == Locale::POSIX {
-            let format = get_message_format_for_locale(Locale::from_str("fr_FR").unwrap());
+            let format = get_message_format_for_locale(Locale::from_str("fr_FR").unwrap(), false);
             println!("{:#?}", format);
             let format = format.unwrap();
-            assert_eq!(format.yes_string, Some("yes".to_string()));
+            assert_eq!(format.yes_expression, Some("^[oOyY].*".to_string()));
             assert_eq!(format.no_string, Some("no".to_string()));
         } else {
             panic!("expecting POSIX locale");

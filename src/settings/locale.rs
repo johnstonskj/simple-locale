@@ -89,7 +89,11 @@ pub mod api {
         unsafe {
             let c_str: *mut raw::c_char =
                 setlocale(category, new_locale.to_string().as_ptr() as *const i8);
-            println!("setlocale(\"{}\") returned {:#?}", new_locale.to_string(), c_str);
+            println!(
+                "setlocale(\"{}\") returned {:#?}",
+                new_locale.to_string(),
+                c_str
+            );
             return !(c_str == ptr::null_mut::<raw::c_char>());
         }
     }
@@ -100,7 +104,11 @@ pub mod api {
         unsafe {
             let c_str: *mut raw::c_char =
                 setlocale(category, new_locale.to_string().as_ptr() as *const i8);
-            println!("setlocale(\"{}\") returned {:#?}", new_locale.to_string(), c_str);
+            println!(
+                "setlocale(\"{}\") returned {:#?}",
+                new_locale.to_string(),
+                c_str
+            );
             return !(c_str == ptr::null_mut::<raw::c_char>());
         }
     }

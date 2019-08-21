@@ -84,7 +84,10 @@ Currently data is generated for the following standards:
 ## TODO
 
 * Determine naming convention between the names in the `codes` and `settings`
-  modules. Expect that the names in code modules will be changed to reflect
-  those in the settings.
+  modules. 
+  * Expect that the names in code modules will be changed to reflect
+    those in the settings.
 * Build and test for Linux.
+  * How to deal with extended `LC_` categories (address, identification,
+    measurement, name, paper, telephone). 
 * Build and test for Windows.

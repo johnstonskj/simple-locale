@@ -142,6 +142,8 @@ pub enum LocaleError {
     UnknownLocale,
     /// Locale category not set/or supported
     UnsetCategory,
+    /// Operating system could not set the specified locale
+    OSError,
     /// The operation you tried to perform was not supported.
     Unsupported,
 }

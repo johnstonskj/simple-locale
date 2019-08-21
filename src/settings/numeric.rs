@@ -51,7 +51,9 @@ pub mod fmt {
     use std::fmt::Display;
 
     pub fn format<T>(value: T) -> String
-        where T: Display {
+    where
+        T: Display,
+    {
         let initial = value.to_string();
         if initial.chars().all(|c| c.is_digit(10) || c == '.') {
             initial

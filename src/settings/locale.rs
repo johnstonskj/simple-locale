@@ -105,7 +105,7 @@ pub mod api {
         unsafe {
             let c_str: *mut raw::c_char =
                 setlocale(category, new_locale.to_string().as_ptr() as *const i8);
-            println!(
+            debug!(
                 "setlocale(\"{}\") returned {:#?}",
                 new_locale.to_string(),
                 c_str
@@ -120,7 +120,7 @@ pub mod api {
         unsafe {
             let c_str: *mut raw::c_char =
                 setlocale(category, new_locale.to_string().as_ptr() as *const i8);
-            println!(
+            debug!(
                 "setlocale(\"{}\") returned {:#?}",
                 new_locale.to_string(),
                 c_str
@@ -134,7 +134,7 @@ pub mod api {
         let category = for_category.to_os_code() as i32;
         unsafe {
             let c_str: *mut raw::c_char = setlocale(category, ptr::null());
-            println!("setlocale(null) returned {:#?}", c_str);
+            debug!("setlocale(null) returned {:#?}", c_str);
             if c_str == ptr::null_mut::<raw::c_char>() {
                 Err(LocaleError::Unsupported)
             } else {

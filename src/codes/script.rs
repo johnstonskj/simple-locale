@@ -97,7 +97,7 @@ fn make_script_lookup() -> HashMap<u16, String> {
     info!("load_script_lookup - create from SCRIPTS");
     let mut lookup_map: HashMap<u16, String> = HashMap::new();
     for script in SCRIPTS.values() {
-        println!("{} -> {}", &script.numeric_code, &script.alphabetic_code);
+        debug!("{} -> {}", &script.numeric_code, &script.alphabetic_code);
         lookup_map.insert(script.numeric_code, script.alphabetic_code.to_string());
     }
     info!("load_script_lookup - mapped {} countries", lookup_map.len());

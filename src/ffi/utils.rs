@@ -58,8 +58,10 @@ pub fn get_format_for_locale<T>(
             true => uselocale(null_loc),
             false => null_loc,
         };
+        println!("newlocale, code: {}, mask: {}", category.to_os_code(), category.to_os_mask());
+        println!("newlocale {:#?}, {:?}", locale, curr_loc);
         let os_loc = newlocale(
-            category.to_os_code() as i32,
+            category.to_os_mask() as i32,
             locale.to_string().as_ptr() as *const i8,
             curr_loc,
         );

@@ -197,7 +197,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_week_day_names() {
-        if set_locale(&Locale::POSIX, Category::Currency) {
+        if set_locale(&Locale::POSIX, Category::Time) {
             let names = get_calendar_names();
             assert_eq!(names.week_day_names.len(), 7);
             let sunday = names.week_day_names.get(0).unwrap();
@@ -215,7 +215,7 @@ mod tests {
 
     #[test]
     fn test_month_names() {
-        if set_locale(&Locale::POSIX, Category::Currency) {
+        if set_locale(&Locale::POSIX, Category::Time) {
             let names = get_calendar_names();
             assert_eq!(names.month_names.len(), 12);
             let january = names.month_names.get(0).unwrap();
@@ -233,7 +233,7 @@ mod tests {
 
     #[test]
     fn test_ampm_names() {
-        if set_locale(&Locale::POSIX, Category::Currency) {
+        if set_locale(&Locale::POSIX, Category::Time) {
             let names = get_calendar_names();
             assert_eq!(names.am_string, Some("AM".to_string()));
             assert_eq!(names.pm_string, Some("PM".to_string()));
@@ -245,7 +245,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_date_time_formats() {
-        if set_locale(&Locale::POSIX, Category::Currency) {
+        if set_locale(&Locale::POSIX, Category::Time) {
             let formats = get_date_time_format();
             println!("{:#?}", formats);
             assert_eq!(formats.date_format, Some("%m/%d/%y".to_string()));

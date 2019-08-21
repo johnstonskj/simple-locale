@@ -52,6 +52,8 @@ for a locale other than the current.
 
 pub mod locale;
 
+pub mod ctype;
+
 pub mod currency;
 
 pub mod messages;

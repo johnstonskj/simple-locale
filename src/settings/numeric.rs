@@ -122,7 +122,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_numeric_settings() {
-        if set_locale(&Locale::POSIX, Category::Currency) {
+        if set_locale(&Locale::POSIX, Category::Numeric) {
             let format = get_numeric_format();
             println!("{:#?}", format);
             assert_eq!(format.decimal_separator, ".");

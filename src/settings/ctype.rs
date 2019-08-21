@@ -1,31 +1,14 @@
 /*!
-Fetch locale-specific message formatting settings.
+Fetch locale-specific code-set settings.
 
 This module is relatively simple as only a small number of
-settings are defined by POSIX for the messages category.
+settings are defined by POSIX for the code-set category.
 
-## Example
-
-```
-use simple_locale::settings::locale::api::get_locale;
-use simple_locale::settings::locale::Category;
-use simple_locale::settings::messages::get_message_format;
-use simple_locale::Locale;
-use std::str::FromStr;
-
-let locale = get_locale(Category::Time).unwrap();
-if locale == Locale::POSIX {
-    let format = get_message_format();
-    assert_eq!(format.yes_expression, Some("^[yY]".to_string()));
-    assert_eq!(format.no_string, Some("no".to_string()));
-} else {
-    panic!("expecting POSIX locale");
-}
-```
 */
 
 use crate::ffi::langinfo;
 use crate::ffi::utils::*;
+use crate::ffi::xlocale::___mb_cur_max;
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
 
@@ -35,32 +18,30 @@ use crate::{Locale, LocaleResult};
 
 /// Settings related to message display.
 #[derive(Debug, Clone, PartialEq)]
-pub struct MessageFormat {
-    /// An expression to validate 'yes' values.
-    pub yes_expression: Option<String>,
-    /// A default string for 'yes'.
-    pub yes_string: Option<String>,
-    /// An expression to validate 'no' values.
-    pub no_expression: Option<String>,
-    /// A default string for 'no'.
-    pub no_string: Option<String>,
+pub struct CodeSetFormat {
+    /// The code set to use when displaying messages in the current locale.
+    /// Note that this does not return standard code set identifiers and so
+    /// this value cannot be used with the `codes::codesets` module.
+    pub code_set: Option<String>,
+    /// The maximum number of bytes needed to represent a single wide
+    /// character in the current locale.
+    pub multibyte_max_bytes: Option<u32>,
 }
 
 // ------------------------------------------------------------------------------------------------
 // Public Functions
 // ------------------------------------------------------------------------------------------------
 
-/// Fetch the message formatting settings for the current locale.
-pub fn get_message_format() -> MessageFormat {
-    MessageFormat {
-        yes_expression: get_nl_string(langinfo::YESEXPR),
-        yes_string: get_nl_string(langinfo::YESSTR),
-        no_expression: get_nl_string(langinfo::NOEXPR),
-        no_string: get_nl_string(langinfo::NOSTR),
+/// Fetch the code-set settings for the current locale.
+pub fn get_code_set_format() -> CodeSetFormat {
+    let mb_max_bytes = unsafe { ___mb_cur_max() as u32 };
+    CodeSetFormat {
+        code_set: get_nl_string(langinfo::CODESET),
+        multibyte_max_bytes: Some(mb_max_bytes),
     }
 }
 
-/// Fetch the message formatting rules for a specified `Locale`.
+/// Fetch the code-set rules for a specified `Locale`.
 ///
 /// # Arguments
 ///
@@ -75,14 +56,14 @@ pub fn get_message_format() -> MessageFormat {
 /// any unspecified components from the current locale. For example, if the
 /// current locale is `en_US.UTF-8` and the parameters passed are `_NZ` and
 /// `true` then the resulting locale will be `en_NZ.UTF-8`.
-pub fn get_message_format_for_locale(
+pub fn get_code_set_format_for_locale(
     locale: Locale,
     inherit_current: bool,
-) -> LocaleResult<MessageFormat> {
+) -> LocaleResult<CodeSetFormat> {
     get_format_for_locale(
-        Category::Message,
+        Category::CharacterTypes,
         locale,
-        &get_message_format,
+        &get_code_set_format,
         inherit_current,
     )
 }
@@ -95,18 +76,18 @@ pub fn get_message_format_for_locale(
 mod tests {
     use crate::settings::locale::api::set_locale;
     use crate::settings::locale::Category;
-    use crate::settings::messages::{get_message_format, get_message_format_for_locale};
+    use crate::settings::ctype::{get_code_set_format, get_code_set_format_for_locale};
     use crate::Locale;
     use std::str::FromStr;
 
     // --------------------------------------------------------------------------------------------
     #[test]
-    fn test_get_message_format() {
-        if set_locale(&Locale::POSIX, Category::Message) {
-            let format = get_message_format();
+    fn test_get_code_set_format() {
+        if set_locale(&Locale::POSIX, Category::CharacterTypes) {
+            let format = get_code_set_format();
             println!("{:#?}", format);
-            assert_eq!(format.yes_expression, Some("^[yY]".to_string()));
-            assert_eq!(format.no_string, Some("no".to_string()));
+            assert_eq!(format.code_set, Some("US-ASCII".to_string()));
+            assert_eq!(format.multibyte_max_bytes, Some(1));
         } else {
             panic!("set_locale returned false");
         }
@@ -114,13 +95,13 @@ mod tests {
 
     // --------------------------------------------------------------------------------------------
     #[test]
-    fn test_get_message_format_for_locale() {
-        if set_locale(&Locale::POSIX, Category::Message) {
-            let format = get_message_format_for_locale(Locale::from_str("fr_FR").unwrap(), false);
+    fn test_get_code_set_format_for_locale() {
+        if set_locale(&Locale::POSIX, Category::CharacterTypes) {
+            let format = get_code_set_format_for_locale(Locale::from_str("fr_FR").unwrap(), false);
             println!("{:#?}", format);
             let format = format.unwrap();
-            assert_eq!(format.yes_expression, Some("^[oOyY].*".to_string()));
-            assert_eq!(format.no_string, Some("no".to_string()));
+            assert_eq!(format.code_set, None);
+            assert_eq!(format.multibyte_max_bytes, Some(4));
         } else {
             panic!("set_locale returned false");
         }

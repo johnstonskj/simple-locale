@@ -253,7 +253,6 @@ mod tests {
         }
     }
 
-    // --------------------------------------------------------------------------------------------
     #[test]
     fn test_currency_settings_us() {
         let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
@@ -263,6 +262,25 @@ mod tests {
             assert_eq!(format.number_format.decimal_separator, ".");
             assert_eq!(format.local_format.unwrap().currency_symbol, "$");
             assert_eq!(format.international_format.unwrap().currency_symbol, "USD ");
+        } else {
+            panic!("set_locale returned false");
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------
+    #[test]
+    fn test_currency_settings_for_locale() {
+        if set_locale(&Locale::POSIX, Category::Currency) {
+            let locale = Locale::from_str("ja_JP.SJIS").unwrap();
+            let format = get_currency_format_for_locale(locale, false).unwrap();
+            println!("{:#?}", format);
+            assert_eq!(format.number_format.decimal_separator, ".");
+            assert!(format.local_format.is_some());
+            assert!(format.international_format.is_some());
+            assert_eq!(
+                format.international_format.unwrap().currency_symbol,
+                "JPY ".to_string()
+            );
         } else {
             panic!("set_locale returned false");
         }

@@ -24,7 +24,7 @@ if locale == Locale::POSIX {
 ```
 */
 
-use crate::ffi::langinfo;
+use crate::ffi::*;
 use crate::ffi::utils::*;
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
@@ -53,10 +53,10 @@ pub struct MessageFormat {
 /// Fetch the message formatting settings for the current locale.
 pub fn get_message_format() -> MessageFormat {
     MessageFormat {
-        yes_expression: get_nl_string(langinfo::YESEXPR),
-        yes_string: get_nl_string(langinfo::YESSTR),
-        no_expression: get_nl_string(langinfo::NOEXPR),
-        no_string: get_nl_string(langinfo::NOSTR),
+        yes_expression: get_nl_string(YESEXPR),
+        yes_string: get_nl_string(YESSTR),
+        no_expression: get_nl_string(NOEXPR),
+        no_string: get_nl_string(NOSTR),
     }
 }
 

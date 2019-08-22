@@ -13,7 +13,7 @@ strings may also be used with the chrono crate's
 module.
 */
 
-use crate::ffi::langinfo;
+use crate::ffi::*;
 use crate::ffi::utils::*;
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
@@ -44,16 +44,6 @@ pub struct CalendarNames {
     pm_string: Option<String>,
 }
 
-/// Determines in general whether days are displayed before, or
-/// after, months.
-#[derive(Debug, Clone, PartialEq)]
-pub enum MonthDayOrder {
-    /// Display month, then day
-    MonthDay,
-    /// Display day, then month
-    DayMonth,
-}
-
 /// The complete date and time formatting information.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DateTimeFormat {
@@ -75,8 +65,6 @@ pub struct DateTimeFormat {
     era_time_format: Option<String>,
     /// The alternate symbols for digits.
     alternate_digit_symbol: Option<String>,
-    /// The locale's preference on date and month ordering.
-    month_day_order: Option<MonthDayOrder>,
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -86,10 +74,10 @@ pub struct DateTimeFormat {
 /// Fetch calendar names for days and months.
 pub fn get_calendar_names() -> CalendarNames {
     CalendarNames {
-        week_day_names: make_name_vector(7, langinfo::DAY_1, langinfo::ABDAY_1),
-        month_names: make_name_vector(12, langinfo::MON_1, langinfo::ABMON_1),
-        am_string: get_nl_string(langinfo::AM_STR),
-        pm_string: get_nl_string(langinfo::PM_STR),
+        week_day_names: make_name_vector(7, DAY_1, ABDAY_1),
+        month_names: make_name_vector(12, MON_1, ABMON_1),
+        am_string: get_nl_string(AM_STR),
+        pm_string: get_nl_string(PM_STR),
     }
 }
 
@@ -118,27 +106,15 @@ pub fn get_calendar_names_for_locale(
 /// Fetch the date and time formatting settings for the current locale.
 pub fn get_date_time_format() -> DateTimeFormat {
     DateTimeFormat {
-        date_time_format: get_nl_string(langinfo::D_T_FMT),
-        date_format: get_nl_string(langinfo::D_FMT),
-        time_format: get_nl_string(langinfo::T_FMT),
-        time_ampm_format: get_nl_string(langinfo::T_FMT_AMPM),
-        era: get_nl_string(langinfo::ERA),
-        era_date_time_format: get_nl_string(langinfo::ERA_D_T_FMT),
-        era_date_format: get_nl_string(langinfo::ERA_D_FMT),
-        era_time_format: get_nl_string(langinfo::ERA_T_FMT),
-        alternate_digit_symbol: get_nl_string(langinfo::ALT_DIGITS),
-        month_day_order: match get_nl_string(langinfo::D_MD_ORDER) {
-            Some(s) => {
-                if s == "md".to_string() {
-                    Some(MonthDayOrder::MonthDay)
-                } else if s == "dm".to_string() {
-                    Some(MonthDayOrder::DayMonth)
-                } else {
-                    None
-                }
-            }
-            _ => None,
-        },
+        date_time_format: get_nl_string(D_T_FMT),
+        date_format: get_nl_string(D_FMT),
+        time_format: get_nl_string(T_FMT),
+        time_ampm_format: get_nl_string(T_FMT_AMPM),
+        era: get_nl_string(ERA),
+        era_date_time_format: get_nl_string(ERA_D_T_FMT),
+        era_date_format: get_nl_string(ERA_D_FMT),
+        era_time_format: get_nl_string(ERA_T_FMT),
+        alternate_digit_symbol: get_nl_string(ALT_DIGITS),
     }
 }
 
@@ -191,7 +167,7 @@ mod tests {
     use super::{get_calendar_names, get_date_time_format};
     use crate::settings::locale::api::set_locale;
     use crate::settings::locale::Category;
-    use crate::settings::time::{MonthDayOrder, Name};
+    use crate::settings::time::Name;
     use crate::Locale;
 
     // --------------------------------------------------------------------------------------------
@@ -250,7 +226,6 @@ mod tests {
             println!("{:#?}", formats);
             assert_eq!(formats.date_format, Some("%m/%d/%y".to_string()));
             assert_eq!(formats.era, None);
-            assert_eq!(formats.month_day_order, Some(MonthDayOrder::MonthDay));
         } else {
             panic!("set_locale returned false");
         }

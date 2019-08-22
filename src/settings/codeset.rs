@@ -6,9 +6,8 @@ settings are defined by POSIX for the code-set category.
 
 */
 
-use crate::ffi::langinfo;
+use crate::ffi::{CODESET, ___mb_cur_max};
 use crate::ffi::utils::*;
-use crate::ffi::xlocale::___mb_cur_max;
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
 
@@ -36,7 +35,7 @@ pub struct CodeSetFormat {
 pub fn get_code_set_format() -> CodeSetFormat {
     let mb_max_bytes = unsafe { ___mb_cur_max() as u32 };
     CodeSetFormat {
-        code_set: get_nl_string(langinfo::CODESET),
+        code_set: get_nl_string(CODESET),
         multibyte_max_bytes: Some(mb_max_bytes),
     }
 }

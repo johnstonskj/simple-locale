@@ -10,11 +10,7 @@ tend to only rely on one or the other. The first implementation,
 variables only.
 */
 
-use crate::ffi::locale::*;
-use crate::ffi::xlocale::{
-    LC_COLLATE_MASK, LC_CTYPE_MASK, LC_MESSAGES_MASK, LC_MONETARY_MASK, LC_NUMERIC_MASK,
-    LC_TIME_MASK,
-};
+use crate::ffi::*;
 
 // ------------------------------------------------------------------------------------------------
 // Public Types
@@ -91,7 +87,7 @@ impl Category {
 /// Get and set the current locale using the POSIX C API.
 pub mod api {
     use super::*;
-    use crate::ffi::locale::setlocale;
+    use crate::ffi::setlocale;
     use crate::locale::Locale;
     use crate::{LocaleError, LocaleResult};
     use std::ffi::CStr;

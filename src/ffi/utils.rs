@@ -5,8 +5,7 @@ use std::ffi::CStr;
 use std::os::raw::c_char;
 use std::ptr;
 
-use super::langinfo::{nl_item, nl_langinfo};
-use crate::ffi::xlocale::{_xlocale, freelocale, newlocale, uselocale};
+use crate::ffi::{nl_item, nl_langinfo, locale_t, freelocale, newlocale, uselocale};
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleError, LocaleResult};
 
@@ -58,7 +57,7 @@ pub fn get_format_for_locale<T>(
     inherit_current: bool,
 ) -> LocaleResult<T> {
     let os_loc = unsafe {
-        let null_loc: *mut _xlocale = ptr::null_mut();
+        let null_loc: locale_t = ptr::null_mut();
         let curr_loc = match inherit_current {
             true => uselocale(null_loc),
             false => null_loc,

@@ -43,7 +43,7 @@ if set_locale(&Locale::String(en_us), Category::Currency) {
 ```
 */
 
-use crate::ffi::locale::localeconv;
+use crate::ffi::localeconv;
 use crate::ffi::utils::*;
 use crate::settings::locale::Category;
 use crate::settings::numeric::NumericFormat;

@@ -11,10 +11,10 @@
 case $(uname) in
   Darwin)
     if [[ $(command -v llvm-config) ]] ; then
-      MAC_PLATFORM=MacOSX
-      INCLUDE="$(xcode-select -p)/Platforms/$MAC_PLATFORM.platform/Developer/SDKs/$MAC_PLATFORM.sdk/usr/include"
-      BIND_HEADERS=langinfo,localcharset,locale,xlocale
-      MODULE=macos
+	MAC_PLATFORM=MacOSX
+	INCLUDE="$(xcode-select -p)/Platforms/$MAC_PLATFORM.platform/Developer/SDKs/$MAC_PLATFORM.sdk/usr/include"
+	BIND_HEADERS=langinfo,locale,xlocale
+	MODULE=macos
     else
         echo "llvm not installed, or not on the path, try:"
         echo "$ brew install llvm"
@@ -23,15 +23,29 @@ case $(uname) in
     fi
     ;;
   Linux)
-    INCLUDE="/usr/include"
-    BIND_HEADERS=langinfo,localcharset,locale,xlocale
-    MODULE=linux
+    if [[ $(command -v llvm-config) ]] ; then
+	INCLUDE="/usr/include"
+	BIND_HEADERS=langinfo,locale
+	MODULE=linux
+    else
+        echo "llvm not installed, or not on the path, try:"
+	echo "sudo apt-get install llvm"
+	echo "sudo apt-get install clang"
+	exit 2
+    fi
     ;;
   *)
     echo "Unsupported O/S"
     exit 1
     ;;
 esac
+
+mkdir -p src/ffi/$MODULE
+
+if [[ ! $(command -v bindgen) ]] ; then
+    cargo install bindgen
+    cargo install rustfmt
+fi
 
 MODULES=""
 for HEADER in ${BIND_HEADERS//,/ }

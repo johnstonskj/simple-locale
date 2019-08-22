@@ -22,7 +22,7 @@ if get_locale(Category::Currency).unwrap() == Locale::POSIX {
 ```
 */
 
-use crate::ffi::locale::localeconv;
+use crate::ffi::localeconv;
 use crate::ffi::utils::*;
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};

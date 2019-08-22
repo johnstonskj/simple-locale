@@ -6,8 +6,8 @@ settings are defined by POSIX for the code-set category.
 
 */
 
-use crate::ffi::{CODESET, ___mb_cur_max};
 use crate::ffi::utils::*;
+use crate::ffi::{___mb_cur_max, CODESET};
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
 

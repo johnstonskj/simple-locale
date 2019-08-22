@@ -24,8 +24,8 @@ if locale == Locale::POSIX {
 ```
 */
 
-use crate::ffi::*;
 use crate::ffi::utils::*;
+use crate::ffi::*;
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleResult};
 

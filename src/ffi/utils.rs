@@ -5,7 +5,7 @@ use std::ffi::CStr;
 use std::os::raw::c_char;
 use std::ptr;
 
-use crate::ffi::{nl_item, nl_langinfo, locale_t, freelocale, newlocale, uselocale};
+use crate::ffi::{freelocale, locale_t, newlocale, nl_item, nl_langinfo, uselocale};
 use crate::settings::locale::Category;
 use crate::{Locale, LocaleError, LocaleResult};
 

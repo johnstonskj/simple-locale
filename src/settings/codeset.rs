@@ -74,15 +74,14 @@ pub fn get_code_set_format_for_locale(
 #[cfg(test)]
 mod tests {
     use crate::settings::codeset::{get_code_set_format, get_code_set_format_for_locale};
-    use crate::settings::locale::api::set_locale;
-    use crate::settings::locale::Category;
+    use crate::settings::locale::{set_locale, Category};
     use crate::Locale;
     use std::str::FromStr;
 
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_get_code_set_format() {
-        if set_locale(&Locale::POSIX, Category::CharacterTypes) {
+        if set_locale(&Locale::POSIX, &Category::CharacterTypes) {
             let format = get_code_set_format();
             println!("{:#?}", format);
             assert_eq!(format.code_set, Some("US-ASCII".to_string()));
@@ -95,7 +94,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_get_code_set_format_for_locale() {
-        if set_locale(&Locale::POSIX, Category::CharacterTypes) {
+        if set_locale(&Locale::POSIX, &Category::CharacterTypes) {
             let format = get_code_set_format_for_locale(Locale::from_str("fr_FR").unwrap(), false);
             println!("{:#?}", format);
             let format = format.unwrap();
@@ -108,7 +107,7 @@ mod tests {
 
     #[test]
     fn test_get_code_set_format_for_locale_2() {
-        if set_locale(&Locale::POSIX, Category::CharacterTypes) {
+        if set_locale(&Locale::POSIX, &Category::CharacterTypes) {
             let format =
                 get_code_set_format_for_locale(Locale::from_str("fr_FR.UTF-8").unwrap(), false);
             println!("{:#?}", format);

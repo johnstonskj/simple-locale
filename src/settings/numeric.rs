@@ -8,12 +8,11 @@ numbers, and imaginary numbers are not covered.
 ## Example
 
 ```
-use simple_locale::settings::locale::api::get_locale;
-use simple_locale::settings::locale::Category;
+use simple_locale::settings::locale::{Category, get_locale};
 use simple_locale::settings::numeric::get_numeric_format;
 use simple_locale::Locale;
 
-if get_locale(Category::Currency).unwrap() == Locale::POSIX {
+if get_locale(&Category::Currency).unwrap() == Locale::POSIX {
     let format = get_numeric_format();
     assert_eq!(format.decimal_separator, ".");
 } else {
@@ -115,14 +114,13 @@ pub mod fmt {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::locale::api::*;
-    use crate::settings::locale::Category;
+    use crate::settings::locale::{set_locale, Category};
     use crate::Locale;
 
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_numeric_settings() {
-        if set_locale(&Locale::POSIX, Category::Numeric) {
+        if set_locale(&Locale::POSIX, &Category::Numeric) {
             let format = get_numeric_format();
             println!("{:#?}", format);
             assert_eq!(format.decimal_separator, ".");

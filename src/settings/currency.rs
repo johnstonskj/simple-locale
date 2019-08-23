@@ -19,13 +19,12 @@ The following should display "19 US Dollars and 99 cents".
 use std::str::FromStr;
 use simple_locale::{Locale, LocaleString};
 use simple_locale::codes::currency;
-use simple_locale::settings::locale::Category;
-use simple_locale::settings::locale::api::*;
+use simple_locale::settings::locale::{Category, set_locale};
 use simple_locale::settings::currency::get_currency_format;
 
 let amount: f64 = 19.9950;
 let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
-if set_locale(&Locale::String(en_us), Category::Currency) {
+if set_locale(&Locale::String(en_us), &Category::Currency) {
     let format = get_currency_format();
     let currency = currency::lookup_by_alpha(&format.international_format.unwrap().currency_symbol.trim()).unwrap();
     let local = format.local_format.unwrap();
@@ -234,15 +233,14 @@ pub fn get_currency_format_for_locale(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::settings::locale::api::*;
-    use crate::settings::locale::Category;
+    use crate::settings::locale::{set_locale, Category};
     use crate::{Locale, LocaleString};
     use std::str::FromStr;
 
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_currency_settings() {
-        if set_locale(&Locale::POSIX, Category::Currency) {
+        if set_locale(&Locale::POSIX, &Category::Currency) {
             let format = get_currency_format();
             println!("{:#?}", format);
             assert_eq!(format.number_format.decimal_separator, "");
@@ -256,7 +254,7 @@ mod tests {
     #[test]
     fn test_currency_settings_us() {
         let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
-        if set_locale(&Locale::String(en_us), Category::Currency) {
+        if set_locale(&Locale::String(en_us), &Category::Currency) {
             let format = get_currency_format();
             println!("{:#?}", format);
             assert_eq!(format.number_format.decimal_separator, ".");
@@ -270,7 +268,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_currency_settings_for_locale() {
-        if set_locale(&Locale::POSIX, Category::Currency) {
+        if set_locale(&Locale::POSIX, &Category::Currency) {
             let locale = Locale::from_str("ja_JP.SJIS").unwrap();
             let format = get_currency_format_for_locale(locale, false).unwrap();
             println!("{:#?}", format);

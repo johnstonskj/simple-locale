@@ -68,14 +68,13 @@ only the simplest of the formatting options to display our currency amount.
 ```
 use std::str::FromStr;
 use simple_locale::{Locale, LocaleString};
-use simple_locale::settings::locale::Category;
-use simple_locale::settings::locale::api::*;
+use simple_locale::settings::locale::{Category, set_locale};
 use simple_locale::settings::currency::get_currency_format;
 
 let amount: f64 = 5.909;
 let en_us = LocaleString::from_str("en_US.UTF-8").unwrap();
 
-if set_locale(&Locale::String(en_us), Category::Currency) {
+if set_locale(&Locale::String(en_us), &Category::Currency) {
     let format = get_currency_format();
     let local = format.local_format.unwrap();
     println!(

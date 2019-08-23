@@ -165,15 +165,14 @@ fn make_name_vector(count: u32, n_st: u32, ab_st: u32) -> Vec<Name> {
 #[cfg(test)]
 mod tests {
     use super::{get_calendar_names, get_date_time_format};
-    use crate::settings::locale::api::set_locale;
-    use crate::settings::locale::Category;
+    use crate::settings::locale::{set_locale, Category};
     use crate::settings::time::Name;
     use crate::Locale;
 
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_week_day_names() {
-        if set_locale(&Locale::POSIX, Category::Time) {
+        if set_locale(&Locale::POSIX, &Category::Time) {
             let names = get_calendar_names();
             assert_eq!(names.week_day_names.len(), 7);
             let sunday = names.week_day_names.get(0).unwrap();
@@ -191,7 +190,7 @@ mod tests {
 
     #[test]
     fn test_month_names() {
-        if set_locale(&Locale::POSIX, Category::Time) {
+        if set_locale(&Locale::POSIX, &Category::Time) {
             let names = get_calendar_names();
             assert_eq!(names.month_names.len(), 12);
             let january = names.month_names.get(0).unwrap();
@@ -209,7 +208,7 @@ mod tests {
 
     #[test]
     fn test_ampm_names() {
-        if set_locale(&Locale::POSIX, Category::Time) {
+        if set_locale(&Locale::POSIX, &Category::Time) {
             let names = get_calendar_names();
             assert_eq!(names.am_string, Some("AM".to_string()));
             assert_eq!(names.pm_string, Some("PM".to_string()));
@@ -221,7 +220,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_date_time_formats() {
-        if set_locale(&Locale::POSIX, Category::Time) {
+        if set_locale(&Locale::POSIX, &Category::Time) {
             let formats = get_date_time_format();
             println!("{:#?}", formats);
             assert_eq!(formats.date_format, Some("%m/%d/%y".to_string()));

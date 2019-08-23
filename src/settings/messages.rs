@@ -7,13 +7,12 @@ settings are defined by POSIX for the messages category.
 ## Example
 
 ```
-use simple_locale::settings::locale::api::get_locale;
-use simple_locale::settings::locale::Category;
+use simple_locale::settings::locale::{Category, get_locale};
 use simple_locale::settings::messages::get_message_format;
 use simple_locale::Locale;
 use std::str::FromStr;
 
-let locale = get_locale(Category::Time).unwrap();
+let locale = get_locale(&Category::Time).unwrap();
 if locale == Locale::POSIX {
     let format = get_message_format();
     assert_eq!(format.yes_expression, Some("^[yY]".to_string()));
@@ -93,8 +92,7 @@ pub fn get_message_format_for_locale(
 
 #[cfg(test)]
 mod tests {
-    use crate::settings::locale::api::set_locale;
-    use crate::settings::locale::Category;
+    use crate::settings::locale::{set_locale, Category};
     use crate::settings::messages::{get_message_format, get_message_format_for_locale};
     use crate::Locale;
     use std::str::FromStr;
@@ -102,7 +100,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_get_message_format() {
-        if set_locale(&Locale::POSIX, Category::Message) {
+        if set_locale(&Locale::POSIX, &Category::Message) {
             let format = get_message_format();
             println!("{:#?}", format);
             assert_eq!(format.yes_expression, Some("^[yY]".to_string()));
@@ -115,7 +113,7 @@ mod tests {
     // --------------------------------------------------------------------------------------------
     #[test]
     fn test_get_message_format_for_locale() {
-        if set_locale(&Locale::POSIX, Category::Message) {
+        if set_locale(&Locale::POSIX, &Category::Message) {
             let format = get_message_format_for_locale(Locale::from_str("fr_FR").unwrap(), false);
             println!("{:#?}", format);
             let format = format.unwrap();

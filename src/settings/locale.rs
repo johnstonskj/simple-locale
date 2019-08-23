@@ -2,7 +2,10 @@
 Provides ability to get/set the current process locale.
 
 This module allows the client to fetch and set locales for different
-`Category` values, or for all.
+`Category` values, or for all. This is a core capability for clients
+to be able to set the current locale for their process. If you only
+plan to set the locale, get settings, and then reset the locale you
+may want to look at the `_for_locale` version of settings functions.
 
 ## Example
 
@@ -101,24 +104,24 @@ pub fn set_locale_all(new_locale: &Locale) -> bool {
     set_locale_wrapper(Category::all_code() as i32, &new_locale.to_string())
 }
 
-/// Set all locale categories based on the `LC_ALL` and `LANG` environment
-/// variables.
+/// Set all locale categories, based on the `LC_ALL` and `LANG` environment
+/// variables,  to `new_locale`.
 pub fn set_locale_all_from_env() -> bool {
     set_locale_wrapper(Category::all_code() as i32, DEFAULT_LOCALE)
 }
 
-/// Set the  locale to `new_locale` for the `for_category` category only.
+/// Set the  locale to `new_locale` for the `for_category` category  to `new_locale`.
 pub fn set_locale(new_locale: &Locale, for_category: &Category) -> bool {
     set_locale_wrapper(for_category.to_os_code() as i32, &new_locale.to_string())
 }
 
-/// Set the  locale for the `for_category` category based on the value
-/// of the `LC_{category}` environment variables.
+/// Set the  locale for the `for_category` category, based on the value
+/// of the `LC_{category}` environment variables,  to `new_locale`.
 pub fn set_locale_from_env(for_category: &Category) -> bool {
     set_locale_wrapper(for_category.to_os_code() as i32, DEFAULT_LOCALE)
 }
 
-/// Get the  locale for the `for_category` category only.
+/// Get the locale for the `for_category` category only.
 pub fn get_locale(for_category: &Category) -> LocaleResult<Locale> {
     let category = for_category.to_os_code() as i32;
     unsafe {

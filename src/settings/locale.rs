@@ -3,6 +3,29 @@ Provides ability to get/set the current process locale.
 
 This module allows the client to fetch and set locales for different
 `Category` values, or for all.
+
+## Example
+
+```
+use simple_locale::{Locale, LocaleString};
+use simple_locale::settings::locale::*;
+use std::str::FromStr;
+
+let old_locale = get_locale(&Category::Currency);
+
+if old_locale.is_ok() {
+    if set_locale(&Locale::String(LocaleString::from_str("en_US").unwrap()), &Category::Currency) {
+        // do something with new locale...
+        if !set_locale(&old_locale.unwrap(), &Category::Currency) {
+            panic!("Could not re-set the old locale");
+        }
+    } else {
+        panic!("Could not set the new locale");
+    }
+} else {
+    panic!("Could not save the existing locale");
+}
+```
 */
 
 use crate::ffi::*;

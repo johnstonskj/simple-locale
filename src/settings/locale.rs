@@ -115,6 +115,8 @@ pub fn get_locale(for_category: &Category) -> LocaleResult<Locale> {
 // ------------------------------------------------------------------------------------------------
 
 fn set_locale_wrapper(category: i32, new_locale: &str) -> bool {
+    // this is a nice wrapper around the FFI function, it only really
+    // does type transformation, logging, and error handling.
     unsafe {
         let c_str: *mut raw::c_char = setlocale(category, new_locale.as_ptr() as *const i8);
         debug!(
@@ -142,6 +144,7 @@ mod tests {
         for category in [
             Category::CharacterTypes,
             Category::Currency,
+            Category::Message,
             Category::Numeric,
             Category::StringCollation,
             Category::Time,
@@ -161,6 +164,7 @@ mod tests {
         for category in [
             Category::CharacterTypes,
             Category::Currency,
+            Category::Message,
             Category::Numeric,
             Category::StringCollation,
             Category::Time,
@@ -190,6 +194,7 @@ mod tests {
         // check everything else is left as-was
         for category in [
             Category::CharacterTypes,
+            Category::Message,
             Category::Numeric,
             Category::StringCollation,
             Category::Time,

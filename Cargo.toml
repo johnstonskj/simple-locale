@@ -1,6 +1,6 @@
 [package]
 name = "simple-locale"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Simon Johnston <johnstonskj@gmail.com>"]
 edition = "2018"
 description = "An interface to all manner of locale-related information."

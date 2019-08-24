@@ -9,6 +9,7 @@ repository = "https://github.com/johnstonskj/simple-locale.git"
 readme = "README.md"
 license = "MIT"
 keywords = ["locale", "POSIX"]
+categories = ["Internationalization (i18n)", "Localization (L10n)", "Operating systems"]
 
 [dependencies]
 lazy_static = "1.3.0"

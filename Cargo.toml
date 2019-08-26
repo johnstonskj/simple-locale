@@ -1,13 +1,15 @@
 [package]
 name = "simple-locale"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Simon Johnston <johnstonskj@gmail.com>"]
 edition = "2018"
-description = "An interface to all manner of locale-related information."
+description = "An idiomatic interface to all manner of locale-related information."
+documentation = "https://docs.rs/crate/simple-locale"
 repository = "https://github.com/johnstonskj/simple-locale.git"
 readme = "README.md"
 license = "MIT"
 keywords = ["locale", "POSIX"]
+categories = ["Internationalization (i18n)", "Localization (L10n)", "Operating systems"]
 
 [dependencies]
 lazy_static = "1.3.0"

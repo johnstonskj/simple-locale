@@ -7,8 +7,6 @@
 ![mit License](https://img.shields.io/badge/license-mit-118811.svg)
 [![GitHub stars](https://img.shields.io/github/stars/johnstonskj/simple-locale.svg)](https://github.com/johnstonskj/simple-locale/stargazers)
 
-An idiomatic Rust crate for locale, and locale-like, operations.
-
 This crate provides a higher-level interface to a number of locale-related
 sources, in three areas:
 

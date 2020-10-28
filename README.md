@@ -1,10 +1,10 @@
 # Crate simple-locale
 
-[![travis.ci](https://travis-ci.org/johnstonskj/simple-locale.svg?branch=master)](https://travis-ci.org/johnstonskj/simple-locale)
+![mit License](https://img.shields.io/badge/license-mit-118811.svg)
+![Minimum Rust Version](https://img.shields.io/badge/Min%20Rust-1.34-green.svg)
 [![crates.io](https://img.shields.io/crates/v/simple-locale.svg)](https://crates.io/crates/simple-locale)
 [![docs.rs](https://docs.rs/simple-locale/badge.svg)](https://docs.rs/simple-locale)
-![Minimum Rust Version](https://img.shields.io/badge/Min%20Rust-1.34-green.svg)
-![mit License](https://img.shields.io/badge/license-mit-118811.svg)
+![Build](https://github.com/johnstonskj/simple-locale/workflows/Rust/badge.svg)
 [![GitHub stars](https://img.shields.io/github/stars/johnstonskj/simple-locale.svg)](https://github.com/johnstonskj/simple-locale/stargazers)
 
 This crate provides a higher-level interface to a number of locale-related

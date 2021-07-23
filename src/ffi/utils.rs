@@ -68,7 +68,7 @@ pub fn get_format_for_locale<T>(
         );
         let os_loc = newlocale(
             category.to_os_mask() as i32,
-            locale.to_string().as_ptr() as *const i8,
+            locale.to_string().as_ptr() as *const c_char,
             curr_loc,
         );
         if os_loc == null_loc {

@@ -144,7 +144,8 @@ fn set_locale_wrapper(category: i32, new_locale: &str) -> bool {
     // this is a nice wrapper around the FFI function, it only really
     // does type transformation, logging, and error handling.
     unsafe {
-        let c_str: *mut raw::c_char = setlocale(category, new_locale.as_ptr() as *const i8);
+        let c_str: *mut raw::c_char =
+            setlocale(category, new_locale.as_ptr() as *const raw::c_char);
         debug!(
             "setlocale({}, {:#?}) returned {:#?}",
             category, new_locale, c_str
